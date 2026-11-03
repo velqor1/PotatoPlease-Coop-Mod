@@ -1,0 +1,32 @@
+# Game Binaries & Assets (Do not commit 3GB game files)
+*.exe
+!dist/Installer/PotatoCoopInstaller.exe
+*.dll
+!Mods/PotatoCoop.dll
+*.pdb
+*.dat
+*.assets
+*.resS
+*.resource
+*.info
+*.config
+*.db
+PotatoPlease_Data/
+MelonLoader/
+D3D12/
+Settings-USNA/
+UserData/
+UserLibs/
+Plugins/
+local/
+
+# Build artifacts
+bin/
+obj/
+*.user
+*.suo
+*.log
+
+# Unzipped dist folders
+dist/PotatoPlease-Steam-Coop-v1.0.0/
+dist/win-x64/

@@ -29,6 +29,8 @@ namespace PotatoCoop.Network
         private Callback<LobbyEnter_t> _lobbyEnterCallback;
         private Callback<LobbyMatchList_t> _lobbyMatchListCallback;
         private Callback<GameLobbyJoinRequested_t> _gameLobbyJoinRequestedCallback;
+        private Callback<LobbyChatUpdate_t> _lobbyChatUpdateCallback;
+        private Callback<LobbyDataUpdate_t> _lobbyDataUpdateCallback;
 
         public static void Initialize()
         {
@@ -47,6 +49,8 @@ namespace PotatoCoop.Network
                 _lobbyEnterCallback = Callback<LobbyEnter_t>.Create((Action<LobbyEnter_t>)OnLobbyEntered);
                 _lobbyMatchListCallback = Callback<LobbyMatchList_t>.Create((Action<LobbyMatchList_t>)OnLobbyMatchList);
                 _gameLobbyJoinRequestedCallback = Callback<GameLobbyJoinRequested_t>.Create((Action<GameLobbyJoinRequested_t>)OnGameLobbyJoinRequested);
+                _lobbyChatUpdateCallback = Callback<LobbyChatUpdate_t>.Create((Action<LobbyChatUpdate_t>)OnLobbyChatUpdate);
+                _lobbyDataUpdateCallback = Callback<LobbyDataUpdate_t>.Create((Action<LobbyDataUpdate_t>)OnLobbyDataUpdate);
                 MelonLogger.Msg("[LobbyManager] Steam lobby callbacks registered.");
             }
             catch (Exception ex)
@@ -68,6 +72,7 @@ namespace PotatoCoop.Network
             {
                 CSteamID lobbyId = new CSteamID(result.m_ulSteamIDLobby);
                 SteamNetManager.Instance.CurrentLobbyId = lobbyId;
+                SteamNetManager.Instance.HostSteamId = SteamNetManager.Instance.LocalSteamId;
                 SteamNetManager.Instance.IsHost = true;
                 SteamNetManager.Instance.IsConnected = true;
                 SteamNetManager.Instance.LocalAssignedSlot = 0;
@@ -77,6 +82,8 @@ namespace PotatoCoop.Network
                 SteamMatchmaking.SetLobbyData(lobbyId, "HostSteamId", SteamNetManager.Instance.LocalSteamId.m_SteamID.ToString());
 
                 MelonLogger.Msg($"[LobbyManager] Lobby created successfully! LobbyID: {lobbyId.m_SteamID}");
+
+                RefreshLobbyMembers();
 
                 var info = new LobbyInfo
                 {
@@ -107,25 +114,34 @@ namespace PotatoCoop.Network
                 CSteamID lobbyId = new CSteamID(result.m_ulSteamIDLobby);
                 SteamNetManager.Instance.CurrentLobbyId = lobbyId;
 
-                string hostIdStr = SteamMatchmaking.GetLobbyData(lobbyId, "HostSteamId");
-                string hostName = SteamMatchmaking.GetLobbyData(lobbyId, "HostName");
+                // In Steamworks, the Lobby Owner is ALWAYS reliably returned by GetLobbyOwner
+                CSteamID hostId = SteamMatchmaking.GetLobbyOwner(lobbyId);
+                bool isHost = (hostId == SteamNetManager.Instance.LocalSteamId);
 
-                if (ulong.TryParse(hostIdStr, out ulong hostId))
+                SteamNetManager.Instance.HostSteamId = hostId;
+                SteamNetManager.Instance.IsHost = isHost;
+                SteamNetManager.Instance.IsConnected = true;
+
+                string hostName = SteamFriends.GetFriendPersonaName(hostId);
+                if (string.IsNullOrEmpty(hostName) || hostName == "[unknown]")
                 {
-                    SteamNetManager.Instance.HostSteamId = new CSteamID(hostId);
-                    if (hostId == SteamNetManager.Instance.LocalSteamId.m_SteamID)
-                    {
-                        SteamNetManager.Instance.IsHost = true;
-                    }
-                    else
-                    {
-                        SteamNetManager.Instance.IsHost = false;
-                        SteamNetManager.Instance.IsConnected = true;
-                        SteamNetManager.Instance.SendHandshake(SteamNetManager.Instance.HostSteamId);
-                    }
+                    hostName = SteamMatchmaking.GetLobbyData(lobbyId, "HostName");
+                }
+                if (string.IsNullOrEmpty(hostName))
+                {
+                    hostName = isHost ? SteamNetManager.Instance.LocalPlayerName : "Хост";
                 }
 
-                MelonLogger.Msg($"[LobbyManager] Entered lobby {lobbyId.m_SteamID}! Host: {hostName}");
+                MelonLogger.Msg($"[LobbyManager] Entered lobby {lobbyId.m_SteamID}! Host: {hostName} (SteamID: {hostId.m_SteamID}, IsHost: {isHost})");
+
+                // Immediately synchronize all members currently in the lobby
+                RefreshLobbyMembers();
+
+                if (!isHost)
+                {
+                    SteamNetworking.AcceptP2PSessionWithUser(hostId);
+                    SteamNetManager.Instance.SendHandshake(hostId);
+                }
 
                 var info = new LobbyInfo
                 {
@@ -143,6 +159,68 @@ namespace PotatoCoop.Network
             }
         }
 
+        private void OnLobbyChatUpdate(LobbyChatUpdate_t update)
+        {
+            MelonLogger.Msg($"[LobbyManager] Lobby member update for user {update.m_ulSteamIDUserChanged}, change: {update.m_rgfChatMemberStateChange}");
+            CSteamID changedUser = new CSteamID(update.m_ulSteamIDUserChanged);
+
+            if ((update.m_rgfChatMemberStateChange & (uint)EChatMemberStateChange.k_EChatMemberStateChangeEntered) != 0)
+            {
+                if (changedUser != SteamNetManager.Instance.LocalSteamId)
+                {
+                    SteamNetworking.AcceptP2PSessionWithUser(changedUser);
+                    if (SteamNetManager.Instance.IsHost)
+                    {
+                        SteamNetManager.Instance.SendHandshake(changedUser);
+                    }
+                }
+            }
+            else if ((update.m_rgfChatMemberStateChange & ((uint)EChatMemberStateChange.k_EChatMemberStateChangeLeft | (uint)EChatMemberStateChange.k_EChatMemberStateChangeDisconnected)) != 0)
+            {
+                SteamNetManager.Instance.RemovePeer(changedUser.m_SteamID);
+            }
+
+            RefreshLobbyMembers();
+        }
+
+        private void OnLobbyDataUpdate(LobbyDataUpdate_t data)
+        {
+            RefreshLobbyMembers();
+        }
+
+        public void RefreshLobbyMembers()
+        {
+            if (SteamNetManager.Instance.CurrentLobbyId == CSteamID.Nil) return;
+
+            CSteamID lobbyId = SteamNetManager.Instance.CurrentLobbyId;
+            int numMembers = SteamMatchmaking.GetNumLobbyMembers(lobbyId);
+
+            for (int i = 0; i < numMembers; i++)
+            {
+                CSteamID memberId = SteamMatchmaking.GetLobbyMemberByIndex(lobbyId, i);
+                if (memberId == SteamNetManager.Instance.LocalSteamId) continue;
+
+                string memberName = SteamFriends.GetFriendPersonaName(memberId);
+                if (string.IsNullOrEmpty(memberName) || memberName == "[unknown]")
+                {
+                    memberName = "Напарник";
+                }
+
+                if (!SteamNetManager.Instance.ConnectedPeers.Contains(memberId))
+                {
+                    SteamNetManager.Instance.ConnectedPeers.Add(memberId);
+                }
+
+                SteamNetManager.Instance.PeerNames[memberId.m_SteamID] = memberName;
+                if (!SteamNetManager.Instance.PeerSkins.ContainsKey(memberId.m_SteamID))
+                {
+                    SteamNetManager.Instance.PeerSkins[memberId.m_SteamID] = (SteamNetManager.Instance.ConnectedPeers.Count % 4);
+                }
+
+                SteamNetworking.AcceptP2PSessionWithUser(memberId);
+            }
+        }
+
         public void RefreshLobbyList()
         {
             MelonLogger.Msg("[LobbyManager] Refreshing Steam lobby list...");
@@ -154,10 +232,10 @@ namespace PotatoCoop.Network
         private void OnLobbyMatchList(LobbyMatchList_t result)
         {
             var list = new List<LobbyInfo>();
-            uint count = result.m_nLobbiesMatching;
+            uint count = Math.Min(result.m_nLobbiesMatching, 50u);
             MelonLogger.Msg($"[LobbyManager] Lobbies found: {count}");
 
-            for (int i = 0; i < count; i++)
+            for (int i = 0; i < (int)count; i++)
             {
                 CSteamID lobbyId = SteamMatchmaking.GetLobbyByIndex(i);
                 string hostName = SteamMatchmaking.GetLobbyData(lobbyId, "HostName");

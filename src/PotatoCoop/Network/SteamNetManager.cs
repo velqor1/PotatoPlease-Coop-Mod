@@ -337,12 +337,50 @@ namespace PotatoCoop.Network
                         OnPeerLeft?.Invoke(sender.m_SteamID);
                         break;
                     }
+
+                    case PacketType.StartShift:
+                    {
+                        int difficulty = reader.ReadInt32();
+                        MelonLogger.Msg($"[SteamNet] Received StartShift from Host! Starting game session (Diff: {difficulty})...");
+                        if (UI.LobbyUI.Instance != null)
+                        {
+                            UI.LobbyUI.Instance.IsVisible = false;
+                        }
+
+                        var mmc = GameObject.FindObjectOfType<Il2CppPotatoPeeler.MainMenuController>();
+                        if (mmc != null)
+                        {
+                            mmc.BeginShift();
+                        }
+                        else
+                        {
+                            UnityEngine.SceneManagement.SceneManager.LoadScene("level0");
+                        }
+                        break;
+                    }
                 }
             }
             catch (Exception ex)
             {
                 MelonLogger.Error($"[SteamNet] Error parsing packet from {sender.m_SteamID}: {ex.Message}");
             }
+        }
+
+        public void BroadcastStartShift()
+        {
+            byte[] pkt = PacketSerializer.SerializeStartShift(0);
+            BroadcastPacket(pkt, true);
+            MelonLogger.Msg("[SteamNet] Broadcasted StartShift packet to all connected peers!");
+        }
+
+        public void RemovePeer(ulong steamId)
+        {
+            CSteamID target = new CSteamID(steamId);
+            ConnectedPeers.Remove(target);
+            PeerNames.Remove(steamId);
+            PeerSkins.Remove(steamId);
+            OnPeerLeft?.Invoke(steamId);
+            MelonLogger.Msg($"[SteamNet] Peer removed: {steamId}");
         }
 
         public void Disconnect()

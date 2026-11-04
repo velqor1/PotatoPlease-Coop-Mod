@@ -15,11 +15,21 @@ namespace PotatoCoop.Network
         DoorSync = 7,
         EconomySync = 8,
         PlayerLeave = 9,
-        ChatMessage = 10
+        ChatMessage = 10,
+        StartShift = 11
     }
 
     public static class PacketSerializer
     {
+        public static byte[] SerializeStartShift(int difficulty = 0)
+        {
+            using var ms = new MemoryStream();
+            using var writer = new BinaryWriter(ms);
+            writer.Write((byte)PacketType.StartShift);
+            writer.Write(difficulty);
+            return ms.ToArray();
+        }
+
         public static byte[] SerializeHandshake(ulong steamId, string playerName, int skinIndex)
         {
             using var ms = new MemoryStream();

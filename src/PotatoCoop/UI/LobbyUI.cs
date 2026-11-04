@@ -177,6 +177,7 @@ namespace PotatoCoop.UI
                     if (DrawBtn(new Rect(colLeft + 15, btnY, leftW - 30, 42), "▶ НАЧАТЬ СМЕНУ ВСЕМ"))
                     {
                         IsVisible = false;
+                        SteamNetManager.Instance.BroadcastStartShift();
                         var mmc = GameObject.FindObjectOfType<MainMenuController>();
                         if (mmc != null)
                         {
@@ -256,32 +257,88 @@ namespace PotatoCoop.UI
             if (slotIndex == 0)
             {
                 isOccupied = true;
-                pName = SteamNetManager.Instance.IsHost ? SteamNetManager.Instance.LocalPlayerName : (SteamNetManager.Instance.PeerNames.Count > 0 ? "Хост" : "Ожидание хоста...");
-                int skin = SteamNetManager.Instance.IsHost ? SteamNetManager.Instance.LocalSkinIndex : 0;
-                var preset = PuppetModelBuilder.Presets[skin];
-                role = preset.Title;
-                roleCol = preset.ApronColor;
+                if (SteamNetManager.Instance.IsHost)
+                {
+                    pName = SteamNetManager.Instance.LocalPlayerName + " (Вы / Хост)";
+                    int skin = SteamNetManager.Instance.LocalSkinIndex;
+                    var preset = PuppetModelBuilder.Presets[skin];
+                    role = preset.Title;
+                    roleCol = preset.ApronColor;
+                }
+                else
+                {
+                    CSteamID hostId = SteamNetManager.Instance.HostSteamId;
+                    string hName = SteamFriends.GetFriendPersonaName(hostId);
+                    if (string.IsNullOrEmpty(hName) || hName == "[unknown]")
+                    {
+                        if (!SteamNetManager.Instance.PeerNames.TryGetValue(hostId.m_SteamID, out hName))
+                            hName = "Хост";
+                    }
+                    pName = hName + " (Хост)";
+                    int skin = SteamNetManager.Instance.PeerSkins.TryGetValue(hostId.m_SteamID, out int s) ? s : 0;
+                    var preset = PuppetModelBuilder.Presets[Mathf.Clamp(skin, 0, PuppetModelBuilder.Presets.Length - 1)];
+                    role = preset.Title;
+                    roleCol = preset.ApronColor;
+                }
             }
             else
             {
                 int peerIdx = slotIndex - 1;
-                if (!SteamNetManager.Instance.IsHost && slotIndex == SteamNetManager.Instance.LocalAssignedSlot)
+                if (SteamNetManager.Instance.IsHost)
                 {
-                    isOccupied = true;
-                    pName = SteamNetManager.Instance.LocalPlayerName + " (Вы)";
-                    var preset = PuppetModelBuilder.Presets[SteamNetManager.Instance.LocalSkinIndex];
-                    role = preset.Title;
-                    roleCol = preset.ApronColor;
+                    if (peerIdx < SteamNetManager.Instance.ConnectedPeers.Count)
+                    {
+                        isOccupied = true;
+                        var peerId = SteamNetManager.Instance.ConnectedPeers[peerIdx];
+                        string n = SteamFriends.GetFriendPersonaName(peerId);
+                        if (string.IsNullOrEmpty(n) || n == "[unknown]")
+                        {
+                            if (!SteamNetManager.Instance.PeerNames.TryGetValue(peerId.m_SteamID, out n))
+                                n = "Напарник";
+                        }
+                        pName = n;
+                        int skin = SteamNetManager.Instance.PeerSkins.TryGetValue(peerId.m_SteamID, out int s) ? s : slotIndex;
+                        var preset = PuppetModelBuilder.Presets[Mathf.Clamp(skin, 0, PuppetModelBuilder.Presets.Length - 1)];
+                        role = preset.Title;
+                        roleCol = preset.ApronColor;
+                    }
                 }
-                else if (peerIdx < SteamNetManager.Instance.ConnectedPeers.Count)
+                else
                 {
-                    isOccupied = true;
-                    var peerId = SteamNetManager.Instance.ConnectedPeers[peerIdx];
-                    pName = SteamNetManager.Instance.PeerNames.TryGetValue(peerId.m_SteamID, out string n) ? n : "Напарник";
-                    int skin = SteamNetManager.Instance.PeerSkins.TryGetValue(peerId.m_SteamID, out int s) ? s : slotIndex;
-                    var preset = PuppetModelBuilder.Presets[Mathf.Clamp(skin, 0, PuppetModelBuilder.Presets.Length - 1)];
-                    role = preset.Title;
-                    roleCol = preset.ApronColor;
+                    if (slotIndex == 1)
+                    {
+                        isOccupied = true;
+                        pName = SteamNetManager.Instance.LocalPlayerName + " (Вы)";
+                        var preset = PuppetModelBuilder.Presets[SteamNetManager.Instance.LocalSkinIndex];
+                        role = preset.Title;
+                        roleCol = preset.ApronColor;
+                    }
+                    else
+                    {
+                        int otherPeerIdx = slotIndex - 2;
+                        var otherPeers = new List<CSteamID>();
+                        for (int i = 0; i < SteamNetManager.Instance.ConnectedPeers.Count; i++)
+                        {
+                            if (SteamNetManager.Instance.ConnectedPeers[i] != SteamNetManager.Instance.HostSteamId)
+                                otherPeers.Add(SteamNetManager.Instance.ConnectedPeers[i]);
+                        }
+                        if (otherPeerIdx >= 0 && otherPeerIdx < otherPeers.Count)
+                        {
+                            isOccupied = true;
+                            var peerId = otherPeers[otherPeerIdx];
+                            string n = SteamFriends.GetFriendPersonaName(peerId);
+                            if (string.IsNullOrEmpty(n) || n == "[unknown]")
+                            {
+                                if (!SteamNetManager.Instance.PeerNames.TryGetValue(peerId.m_SteamID, out n))
+                                    n = "Напарник";
+                            }
+                            pName = n;
+                            int skin = SteamNetManager.Instance.PeerSkins.TryGetValue(peerId.m_SteamID, out int s) ? s : slotIndex;
+                            var preset = PuppetModelBuilder.Presets[Mathf.Clamp(skin, 0, PuppetModelBuilder.Presets.Length - 1)];
+                            role = preset.Title;
+                            roleCol = preset.ApronColor;
+                        }
+                    }
                 }
             }
 

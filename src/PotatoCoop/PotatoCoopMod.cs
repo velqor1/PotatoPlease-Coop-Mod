@@ -33,9 +33,12 @@ namespace PotatoCoop
             MelonLogger.Msg("  Potato Please Steam Spacewar Co-op Mod Loading  ");
             MelonLogger.Msg("==================================================");
 
-            EnsureSteamOverlay();
-
             SteamNetManager.Initialize();
+            if (SteamNetManager.Instance != null && SteamNetManager.Instance.IsSteamInitialized)
+            {
+                EnsureSteamOverlay();
+            }
+
             LobbyManager.Initialize();
             PuppetManager.Initialize();
             QuestSync.Initialize();
@@ -178,6 +181,45 @@ namespace PotatoCoop
             if (LobbyUI.Instance != null)
             {
                 LobbyUI.Instance.IsVisible = true;
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(MainMenuController), "BeginShift")]
+    public static class Patch_MainMenuController_BeginShift
+    {
+        public static void Prefix(MainMenuController __instance)
+        {
+            if (SteamNetManager.Instance != null && SteamNetManager.Instance.IsHost)
+            {
+                MelonLogger.Msg("[PotatoCoop] Host started BeginShift, broadcasting to all peers!");
+                SteamNetManager.Instance.BroadcastStartShift();
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(MainMenuController), "ConfirmBeginShift")]
+    public static class Patch_MainMenuController_ConfirmBeginShift
+    {
+        public static void Prefix(MainMenuController __instance)
+        {
+            if (SteamNetManager.Instance != null && SteamNetManager.Instance.IsHost)
+            {
+                MelonLogger.Msg("[PotatoCoop] Host confirmed BeginShift, broadcasting to all peers!");
+                SteamNetManager.Instance.BroadcastStartShift();
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(MainMenuController), "ContinueShift")]
+    public static class Patch_MainMenuController_ContinueShift
+    {
+        public static void Prefix(MainMenuController __instance)
+        {
+            if (SteamNetManager.Instance != null && SteamNetManager.Instance.IsHost)
+            {
+                MelonLogger.Msg("[PotatoCoop] Host continued shift, broadcasting to all peers!");
+                SteamNetManager.Instance.BroadcastStartShift();
             }
         }
     }

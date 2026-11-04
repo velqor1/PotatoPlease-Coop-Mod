@@ -19,15 +19,15 @@ namespace PotatoCoop.Puppet
     public enum HatType
     {
         ChefToque,
-        Beret,
+        SovietUshanka,
         SafetyHelmet,
-        BakerCap
+        WorkerCap
     }
 
     public enum FacialType
     {
         CurledMustache,
-        Freckles,
+        BushyMustache,
         WeldingGoggles,
         CleanShaven
     }
@@ -36,56 +36,56 @@ namespace PotatoCoop.Puppet
     {
         public static readonly CharacterVisualConfig[] Presets = new CharacterVisualConfig[]
         {
-            // Player 1: Master Chef (White coat, royal navy apron, tall chef toque, mustache)
+            // Player 1: Master Chef (Dark Navy Coat, Pristine White Apron, Tall Chef Toque with Gold Star, Cossack Mustache)
             new CharacterVisualConfig
             {
                 Title = "ШЕФ-ПОВАР",
-                CoatColor = new Color(0.95f, 0.95f, 0.95f),
-                ApronColor = new Color(0.12f, 0.24f, 0.45f),
-                HatColor = new Color(0.98f, 0.98f, 0.98f),
-                HatAccentColor = new Color(0.85f, 0.65f, 0.15f), // Gold
-                GloveColor = new Color(0.85f, 0.85f, 0.85f),
-                BootColor = new Color(0.15f, 0.15f, 0.15f),
+                CoatColor = new Color(0.15f, 0.20f, 0.28f),
+                ApronColor = new Color(0.92f, 0.92f, 0.90f),
+                HatColor = new Color(0.95f, 0.95f, 0.95f),
+                HatAccentColor = new Color(0.85f, 0.65f, 0.15f), // Gold Cockade
+                GloveColor = new Color(0.24f, 0.20f, 0.18f), // Dark leather
+                BootColor = new Color(0.12f, 0.12f, 0.12f),
                 Hat = HatType.ChefToque,
                 Facial = FacialType.CurledMustache
             },
-            // Player 2: Peeler Specialist (Warm beige coat, crimson red apron, red beret)
+            // Player 2: Peeler Specialist (Soviet Olive Vatnik, Burlap Brown Apron, Ushanka with Red Star)
             new CharacterVisualConfig
             {
                 Title = "МАСТЕР ОЧИСТКИ",
-                CoatColor = new Color(0.85f, 0.80f, 0.70f),
-                ApronColor = new Color(0.75f, 0.18f, 0.15f),
-                HatColor = new Color(0.70f, 0.12f, 0.12f),
-                HatAccentColor = new Color(0.2f, 0.2f, 0.2f),
-                GloveColor = new Color(0.95f, 0.45f, 0.15f), // Orange grip gloves
-                BootColor = new Color(0.25f, 0.18f, 0.12f),
-                Hat = HatType.Beret,
-                Facial = FacialType.Freckles
+                CoatColor = new Color(0.30f, 0.35f, 0.25f),
+                ApronColor = new Color(0.48f, 0.32f, 0.20f),
+                HatColor = new Color(0.28f, 0.24f, 0.20f),
+                HatAccentColor = new Color(0.85f, 0.15f, 0.15f), // Red Star
+                GloveColor = new Color(0.85f, 0.45f, 0.15f), // Heavy industrial rubber orange
+                BootColor = new Color(0.16f, 0.12f, 0.10f),
+                Hat = HatType.SovietUshanka,
+                Facial = FacialType.BushyMustache
             },
-            // Player 3: Press Mechanic (Dark work shirt, forest green heavy apron, yellow helmet & goggles)
+            // Player 3: Press Mechanic (Charcoal Work Jacket, Rubber Black Apron, Hardhat & Welding Goggles)
             new CharacterVisualConfig
             {
                 Title = "МЕХАНИК ПРЕССА",
-                CoatColor = new Color(0.35f, 0.38f, 0.42f),
-                ApronColor = new Color(0.18f, 0.42f, 0.25f),
-                HatColor = new Color(0.95f, 0.80f, 0.10f), // Yellow hardhat
-                HatAccentColor = new Color(0.1f, 0.1f, 0.1f),
-                GloveColor = new Color(0.25f, 0.25f, 0.25f), // Heavy black gloves
-                BootColor = new Color(0.18f, 0.18f, 0.18f),
+                CoatColor = new Color(0.25f, 0.26f, 0.28f),
+                ApronColor = new Color(0.16f, 0.17f, 0.18f),
+                HatColor = new Color(0.92f, 0.75f, 0.10f), // Yellow hardhat
+                HatAccentColor = new Color(0.15f, 0.15f, 0.15f),
+                GloveColor = new Color(0.22f, 0.22f, 0.22f), // Black work gloves
+                BootColor = new Color(0.10f, 0.10f, 0.10f),
                 Hat = HatType.SafetyHelmet,
                 Facial = FacialType.WeldingGoggles
             },
-            // Player 4: Kitchen Apprentice (Light slate coat, royal purple apron, paper baker cap)
+            // Player 4: Kitchen Apprentice (Slate Blue Jacket, Crimson Apron, Peaked Worker Cap)
             new CharacterVisualConfig
             {
                 Title = "ПОДМАСТЕРЬЕ",
-                CoatColor = new Color(0.90f, 0.90f, 0.92f),
-                ApronColor = new Color(0.40f, 0.20f, 0.55f),
-                HatColor = new Color(0.95f, 0.95f, 0.95f),
-                HatAccentColor = new Color(0.7f, 0.15f, 0.2f),
-                GloveColor = new Color(0.3f, 0.6f, 0.9f), // Blue latex gloves
-                BootColor = new Color(0.2f, 0.2f, 0.2f),
-                Hat = HatType.BakerCap,
+                CoatColor = new Color(0.35f, 0.42f, 0.50f),
+                ApronColor = new Color(0.55f, 0.18f, 0.22f),
+                HatColor = new Color(0.30f, 0.28f, 0.26f),
+                HatAccentColor = new Color(0.70f, 0.20f, 0.20f),
+                GloveColor = new Color(0.35f, 0.40f, 0.45f), // Slate grip
+                BootColor = new Color(0.18f, 0.14f, 0.12f),
+                Hat = HatType.WorkerCap,
                 Facial = FacialType.CleanShaven
             }
         };
@@ -97,82 +97,151 @@ namespace PotatoCoop.Puppet
 
             GameObject root = new GameObject($"Puppet_{config.Title}");
 
-            // Standard unlit / simple lit shader for clean readable visuals
+            // Standard / URP Lit shader
             Shader shader = Shader.Find("Universal Render Pipeline/Lit") ?? Shader.Find("Standard") ?? Shader.Find("Diffuse");
 
-            Material coatMat = CreateMaterial(shader, config.CoatColor);
-            Material apronMat = CreateMaterial(shader, config.ApronColor);
-            Material hatMat = CreateMaterial(shader, config.HatColor);
-            Material hatAccentMat = CreateMaterial(shader, config.HatAccentColor);
-            Material skinMat = CreateMaterial(shader, new Color(0.96f, 0.78f, 0.64f)); // Healthy skin
-            Material eyeWhiteMat = CreateMaterial(shader, Color.white);
-            Material eyePupilMat = CreateMaterial(shader, new Color(0.1f, 0.1f, 0.15f));
-            Material gloveMat = CreateMaterial(shader, config.GloveColor);
-            Material bootMat = CreateMaterial(shader, config.BootColor);
-            Material beltMat = CreateMaterial(shader, new Color(0.25f, 0.15f, 0.08f)); // Leather
-            Material buckleMat = CreateMaterial(shader, new Color(0.85f, 0.75f, 0.25f)); // Brass
-            Material hairMat = CreateMaterial(shader, new Color(0.3f, 0.2f, 0.12f));
+            // Matte non-glaring materials with _Smoothness = 0.04f (prevents white ball specular glare!)
+            Material coatMat = CreateMaterial(shader, config.CoatColor, 0.04f);
+            Material apronMat = CreateMaterial(shader, config.ApronColor, 0.04f);
+            Material hatMat = CreateMaterial(shader, config.HatColor, 0.04f);
+            Material hatAccentMat = CreateMaterial(shader, config.HatAccentColor, 0.08f);
+            Material skinMat = CreateMaterial(shader, new Color(0.88f, 0.72f, 0.58f), 0.05f); // Natural matte skin
+            Material eyeWhiteMat = CreateMaterial(shader, new Color(0.92f, 0.92f, 0.92f), 0.10f);
+            Material eyePupilMat = CreateMaterial(shader, new Color(0.12f, 0.12f, 0.14f), 0.10f);
+            Material eyebrowMat = CreateMaterial(shader, new Color(0.20f, 0.15f, 0.10f), 0.02f);
+            Material gloveMat = CreateMaterial(shader, config.GloveColor, 0.05f);
+            Material bootMat = CreateMaterial(shader, config.BootColor, 0.06f);
+            Material beltMat = CreateMaterial(shader, new Color(0.18f, 0.12f, 0.08f), 0.06f); // Dark leather
+            Material buckleMat = CreateMaterial(shader, new Color(0.85f, 0.75f, 0.25f), 0.60f, 0.85f); // Brass metallic
+            Material buttonMat = CreateMaterial(shader, new Color(0.85f, 0.70f, 0.20f), 0.60f, 0.85f); // Brass buttons
+            Material hairMat = CreateMaterial(shader, new Color(0.22f, 0.15f, 0.10f), 0.02f);
 
-            // --- PELVIS & TORSO ---
-            GameObject torso = CreatePrimitive(PrimitiveType.Capsule, "Torso", root.transform);
+            // Container for puppet body visuals so they can be toggled without disabling RootGameObject
+            GameObject bodyContainer = new GameObject("VisualBody");
+            bodyContainer.transform.SetParent(root.transform, false);
+
+            // --- TORSO (Padded Soviet Vatnik Coat) ---
+            GameObject torso = CreatePrimitive(PrimitiveType.Capsule, "Torso", bodyContainer.transform);
             torso.transform.localPosition = new Vector3(0, 1.05f, 0);
-            torso.transform.localScale = new Vector3(0.55f, 0.45f, 0.45f);
+            torso.transform.localScale = new Vector3(0.48f, 0.44f, 0.36f);
             SetMaterial(torso, coatMat);
 
-            // Apron front plate
-            GameObject apron = CreatePrimitive(PrimitiveType.Cube, "Apron", root.transform);
-            apron.transform.localPosition = new Vector3(0, 1.02f, 0.22f);
-            apron.transform.localScale = new Vector3(0.48f, 0.65f, 0.05f);
+            // Coat Collar
+            GameObject collar = CreatePrimitive(PrimitiveType.Cylinder, "CoatCollar", bodyContainer.transform);
+            collar.transform.localPosition = new Vector3(0, 1.35f, 0);
+            collar.transform.localScale = new Vector3(0.34f, 0.04f, 0.32f);
+            SetMaterial(collar, coatMat);
+
+            // Double row of brass buttons on jacket chest
+            for (int r = 0; r < 3; r++)
+            {
+                float y = 1.22f - (r * 0.12f);
+                GameObject btnL = CreatePrimitive(PrimitiveType.Cylinder, $"BtnL_{r}", bodyContainer.transform);
+                btnL.transform.localPosition = new Vector3(-0.08f, y, 0.18f);
+                btnL.transform.localRotation = Quaternion.Euler(90f, 0, 0);
+                btnL.transform.localScale = new Vector3(0.035f, 0.015f, 0.035f);
+                SetMaterial(btnL, buttonMat);
+
+                GameObject btnR = CreatePrimitive(PrimitiveType.Cylinder, $"BtnR_{r}", bodyContainer.transform);
+                btnR.transform.localPosition = new Vector3(0.08f, y, 0.18f);
+                btnR.transform.localRotation = Quaternion.Euler(90f, 0, 0);
+                btnR.transform.localScale = new Vector3(0.035f, 0.015f, 0.035f);
+                SetMaterial(btnR, buttonMat);
+            }
+
+            // Apron front panel
+            GameObject apron = CreatePrimitive(PrimitiveType.Cube, "Apron", bodyContainer.transform);
+            apron.transform.localPosition = new Vector3(0, 0.98f, 0.19f);
+            apron.transform.localScale = new Vector3(0.42f, 0.60f, 0.03f);
             SetMaterial(apron, apronMat);
 
-            // Belt & Brass Buckle
-            GameObject belt = CreatePrimitive(PrimitiveType.Cylinder, "Belt", root.transform);
-            belt.transform.localPosition = new Vector3(0, 0.85f, 0);
-            belt.transform.localScale = new Vector3(0.58f, 0.04f, 0.48f);
+            // Apron kangaroo front pocket
+            GameObject pocket = CreatePrimitive(PrimitiveType.Cube, "ApronPocket", bodyContainer.transform);
+            pocket.transform.localPosition = new Vector3(0, 0.88f, 0.21f);
+            pocket.transform.localScale = new Vector3(0.28f, 0.16f, 0.02f);
+            SetMaterial(pocket, apronMat);
+
+            // Heavy leather tool belt
+            GameObject belt = CreatePrimitive(PrimitiveType.Cylinder, "Belt", bodyContainer.transform);
+            belt.transform.localPosition = new Vector3(0, 0.84f, 0);
+            belt.transform.localScale = new Vector3(0.50f, 0.045f, 0.40f);
             SetMaterial(belt, beltMat);
 
-            GameObject buckle = CreatePrimitive(PrimitiveType.Cube, "Buckle", root.transform);
-            buckle.transform.localPosition = new Vector3(0, 0.85f, 0.26f);
-            buckle.transform.localScale = new Vector3(0.12f, 0.08f, 0.04f);
+            // Brass belt buckle
+            GameObject buckle = CreatePrimitive(PrimitiveType.Cube, "BeltBuckle", bodyContainer.transform);
+            buckle.transform.localPosition = new Vector3(0, 0.84f, 0.22f);
+            buckle.transform.localScale = new Vector3(0.10f, 0.08f, 0.03f);
             SetMaterial(buckle, buckleMat);
+
+            // Side leather tool pouch
+            GameObject pouch = CreatePrimitive(PrimitiveType.Cube, "ToolPouch", bodyContainer.transform);
+            pouch.transform.localPosition = new Vector3(0.24f, 0.82f, 0.05f);
+            pouch.transform.localScale = new Vector3(0.08f, 0.12f, 0.14f);
+            SetMaterial(pouch, beltMat);
 
             // --- HEAD HIERARCHY ---
             GameObject headObj = new GameObject("HeadAnchor");
-            headObj.transform.SetParent(root.transform, false);
-            headObj.transform.localPosition = new Vector3(0, 1.55f, 0);
+            headObj.transform.SetParent(bodyContainer.transform, false);
+            headObj.transform.localPosition = new Vector3(0, 1.52f, 0);
             headTransform = headObj.transform;
 
+            // Sculpted Head Base
             GameObject headMesh = CreatePrimitive(PrimitiveType.Sphere, "Head", headTransform);
             headMesh.transform.localPosition = Vector3.zero;
-            headMesh.transform.localScale = new Vector3(0.42f, 0.45f, 0.42f);
+            headMesh.transform.localScale = new Vector3(0.36f, 0.38f, 0.34f);
             SetMaterial(headMesh, skinMat);
+
+            // Left & Right Ears
+            GameObject lEar = CreatePrimitive(PrimitiveType.Sphere, "LeftEar", headTransform);
+            lEar.transform.localPosition = new Vector3(-0.19f, 0.01f, 0);
+            lEar.transform.localScale = new Vector3(0.05f, 0.09f, 0.06f);
+            SetMaterial(lEar, skinMat);
+
+            GameObject rEar = CreatePrimitive(PrimitiveType.Sphere, "RightEar", headTransform);
+            rEar.transform.localPosition = new Vector3(0.19f, 0.01f, 0);
+            rEar.transform.localScale = new Vector3(0.05f, 0.09f, 0.06f);
+            SetMaterial(rEar, skinMat);
+
+            // Nose
+            GameObject nose = CreatePrimitive(PrimitiveType.Cube, "Nose", headTransform);
+            nose.transform.localPosition = new Vector3(0, 0.02f, 0.18f);
+            nose.transform.localRotation = Quaternion.Euler(-15f, 0, 0);
+            nose.transform.localScale = new Vector3(0.05f, 0.08f, 0.06f);
+            SetMaterial(nose, skinMat);
 
             // Eyes
             GameObject leftEye = CreatePrimitive(PrimitiveType.Sphere, "LeftEye", headTransform);
-            leftEye.transform.localPosition = new Vector3(-0.10f, 0.05f, 0.19f);
-            leftEye.transform.localScale = new Vector3(0.08f, 0.08f, 0.04f);
+            leftEye.transform.localPosition = new Vector3(-0.085f, 0.05f, 0.155f);
+            leftEye.transform.localScale = new Vector3(0.065f, 0.065f, 0.03f);
             SetMaterial(leftEye, eyeWhiteMat);
 
             GameObject leftPupil = CreatePrimitive(PrimitiveType.Sphere, "LeftPupil", headTransform);
-            leftPupil.transform.localPosition = new Vector3(-0.10f, 0.05f, 0.21f);
-            leftPupil.transform.localScale = new Vector3(0.04f, 0.04f, 0.02f);
+            leftPupil.transform.localPosition = new Vector3(-0.085f, 0.05f, 0.17f);
+            leftPupil.transform.localScale = new Vector3(0.035f, 0.035f, 0.02f);
             SetMaterial(leftPupil, eyePupilMat);
 
             GameObject rightEye = CreatePrimitive(PrimitiveType.Sphere, "RightEye", headTransform);
-            rightEye.transform.localPosition = new Vector3(0.10f, 0.05f, 0.19f);
-            rightEye.transform.localScale = new Vector3(0.08f, 0.08f, 0.04f);
+            rightEye.transform.localPosition = new Vector3(0.085f, 0.05f, 0.155f);
+            rightEye.transform.localScale = new Vector3(0.065f, 0.065f, 0.03f);
             SetMaterial(rightEye, eyeWhiteMat);
 
             GameObject rightPupil = CreatePrimitive(PrimitiveType.Sphere, "RightPupil", headTransform);
-            rightPupil.transform.localPosition = new Vector3(0.10f, 0.05f, 0.21f);
-            rightPupil.transform.localScale = new Vector3(0.04f, 0.04f, 0.02f);
+            rightPupil.transform.localPosition = new Vector3(0.085f, 0.05f, 0.17f);
+            rightPupil.transform.localScale = new Vector3(0.035f, 0.035f, 0.02f);
             SetMaterial(rightPupil, eyePupilMat);
 
-            // Nose
-            GameObject nose = CreatePrimitive(PrimitiveType.Sphere, "Nose", headTransform);
-            nose.transform.localPosition = new Vector3(0, 0.01f, 0.22f);
-            nose.transform.localScale = new Vector3(0.06f, 0.06f, 0.06f);
-            SetMaterial(nose, skinMat);
+            // Thick expressive Soviet worker eyebrows
+            GameObject leftBrow = CreatePrimitive(PrimitiveType.Cube, "LeftBrow", headTransform);
+            leftBrow.transform.localPosition = new Vector3(-0.085f, 0.10f, 0.165f);
+            leftBrow.transform.localRotation = Quaternion.Euler(0, 0, -8f);
+            leftBrow.transform.localScale = new Vector3(0.08f, 0.025f, 0.03f);
+            SetMaterial(leftBrow, eyebrowMat);
+
+            GameObject rightBrow = CreatePrimitive(PrimitiveType.Cube, "RightBrow", headTransform);
+            rightBrow.transform.localPosition = new Vector3(0.085f, 0.10f, 0.165f);
+            rightBrow.transform.localRotation = Quaternion.Euler(0, 0, 8f);
+            rightBrow.transform.localScale = new Vector3(0.08f, 0.025f, 0.03f);
+            SetMaterial(rightBrow, eyebrowMat);
 
             // --- HAT BUILDER ---
             BuildHat(config.Hat, headTransform, hatMat, hatAccentMat);
@@ -180,79 +249,137 @@ namespace PotatoCoop.Puppet
             // --- FACIAL FEATURES ---
             BuildFacial(config.Facial, headTransform, hairMat, buckleMat);
 
-            // --- ARMS ---
+            // --- ARMS & REALISTIC HANDS (NO GIANT WHITE BALLS!) ---
             // Left Arm
             GameObject leftArm = new GameObject("LeftArm");
-            leftArm.transform.SetParent(root.transform, false);
-            leftArm.transform.localPosition = new Vector3(-0.35f, 1.35f, 0);
+            leftArm.transform.SetParent(bodyContainer.transform, false);
+            leftArm.transform.localPosition = new Vector3(-0.32f, 1.30f, 0);
             leftArmTransform = leftArm.transform;
 
             GameObject lUpperArm = CreatePrimitive(PrimitiveType.Cylinder, "L_UpperArm", leftArm.transform);
-            lUpperArm.transform.localPosition = new Vector3(0, -0.22f, 0);
-            lUpperArm.transform.localScale = new Vector3(0.12f, 0.20f, 0.12f);
+            lUpperArm.transform.localPosition = new Vector3(0, -0.16f, 0);
+            lUpperArm.transform.localScale = new Vector3(0.12f, 0.16f, 0.12f);
             SetMaterial(lUpperArm, coatMat);
 
-            GameObject lHand = CreatePrimitive(PrimitiveType.Sphere, "L_Hand", leftArm.transform);
-            lHand.transform.localPosition = new Vector3(0, -0.45f, 0);
-            lHand.transform.localScale = new Vector3(0.14f, 0.14f, 0.14f);
-            SetMaterial(lHand, gloveMat);
+            GameObject lForearm = CreatePrimitive(PrimitiveType.Cylinder, "L_Forearm", leftArm.transform);
+            lForearm.transform.localPosition = new Vector3(0, -0.32f, 0);
+            lForearm.transform.localScale = new Vector3(0.11f, 0.16f, 0.11f);
+            SetMaterial(lForearm, coatMat);
+
+            // Left Glove / Hand (Palm, Thumb, Fingers)
+            BuildHand(leftArm.transform, gloveMat, true);
 
             // Right Arm
             GameObject rightArm = new GameObject("RightArm");
-            rightArm.transform.SetParent(root.transform, false);
-            rightArm.transform.localPosition = new Vector3(0.35f, 1.35f, 0);
+            rightArm.transform.SetParent(bodyContainer.transform, false);
+            rightArm.transform.localPosition = new Vector3(0.32f, 1.30f, 0);
             rightArmTransform = rightArm.transform;
 
             GameObject rUpperArm = CreatePrimitive(PrimitiveType.Cylinder, "R_UpperArm", rightArm.transform);
-            rUpperArm.transform.localPosition = new Vector3(0, -0.22f, 0);
-            rUpperArm.transform.localScale = new Vector3(0.12f, 0.20f, 0.12f);
+            rUpperArm.transform.localPosition = new Vector3(0, -0.16f, 0);
+            rUpperArm.transform.localScale = new Vector3(0.12f, 0.16f, 0.12f);
             SetMaterial(rUpperArm, coatMat);
 
-            GameObject rHand = CreatePrimitive(PrimitiveType.Sphere, "R_Hand", rightArm.transform);
-            rHand.transform.localPosition = new Vector3(0, -0.45f, 0);
-            rHand.transform.localScale = new Vector3(0.14f, 0.14f, 0.14f);
-            SetMaterial(rHand, gloveMat);
+            GameObject rForearm = CreatePrimitive(PrimitiveType.Cylinder, "R_Forearm", rightArm.transform);
+            rForearm.transform.localPosition = new Vector3(0, -0.32f, 0);
+            rForearm.transform.localScale = new Vector3(0.11f, 0.16f, 0.11f);
+            SetMaterial(rForearm, coatMat);
+
+            // Right Glove / Hand (Palm, Thumb, Fingers)
+            BuildHand(rightArm.transform, gloveMat, false);
 
             // Tool mount socket on right hand
             GameObject toolSocket = new GameObject("RightHandAnchor");
             toolSocket.transform.SetParent(rightArm.transform, false);
-            toolSocket.transform.localPosition = new Vector3(0, -0.48f, 0.15f);
+            toolSocket.transform.localPosition = new Vector3(0, -0.52f, 0.12f);
             rightHandAnchor = toolSocket.transform;
 
-            // --- LEGS ---
+            // --- LEGS & SOVIET KIRZA BOOTS ---
             // Left Leg
             GameObject leftLeg = new GameObject("LeftLeg");
-            leftLeg.transform.SetParent(root.transform, false);
-            leftLeg.transform.localPosition = new Vector3(-0.16f, 0.75f, 0);
+            leftLeg.transform.SetParent(bodyContainer.transform, false);
+            leftLeg.transform.localPosition = new Vector3(-0.15f, 0.76f, 0);
             leftLegTransform = leftLeg.transform;
 
-            GameObject lThigh = CreatePrimitive(PrimitiveType.Cylinder, "L_Leg", leftLeg.transform);
-            lThigh.transform.localPosition = new Vector3(0, -0.32f, 0);
-            lThigh.transform.localScale = new Vector3(0.15f, 0.32f, 0.15f);
-            SetMaterial(lThigh, beltMat);
+            GameObject lPants = CreatePrimitive(PrimitiveType.Cylinder, "L_Pants", leftLeg.transform);
+            lPants.transform.localPosition = new Vector3(0, -0.22f, 0);
+            lPants.transform.localScale = new Vector3(0.14f, 0.24f, 0.14f);
+            SetMaterial(lPants, coatMat);
 
-            GameObject lBoot = CreatePrimitive(PrimitiveType.Cube, "L_Boot", leftLeg.transform);
-            lBoot.transform.localPosition = new Vector3(0, -0.68f, 0.05f);
-            lBoot.transform.localScale = new Vector3(0.17f, 0.15f, 0.26f);
-            SetMaterial(lBoot, bootMat);
+            // Left Kirza Boot (Shaft, Foot, Heel, Sole)
+            BuildBoot(leftLeg.transform, bootMat);
 
             // Right Leg
             GameObject rightLeg = new GameObject("RightLeg");
-            rightLeg.transform.SetParent(root.transform, false);
-            rightLeg.transform.localPosition = new Vector3(0.16f, 0.75f, 0);
+            rightLeg.transform.SetParent(bodyContainer.transform, false);
+            rightLeg.transform.localPosition = new Vector3(0.15f, 0.76f, 0);
             rightLegTransform = rightLeg.transform;
 
-            GameObject rThigh = CreatePrimitive(PrimitiveType.Cylinder, "R_Leg", rightLeg.transform);
-            rThigh.transform.localPosition = new Vector3(0, -0.32f, 0);
-            rThigh.transform.localScale = new Vector3(0.15f, 0.32f, 0.15f);
-            SetMaterial(rThigh, beltMat);
+            GameObject rPants = CreatePrimitive(PrimitiveType.Cylinder, "R_Pants", rightLeg.transform);
+            rPants.transform.localPosition = new Vector3(0, -0.22f, 0);
+            rPants.transform.localScale = new Vector3(0.14f, 0.24f, 0.14f);
+            SetMaterial(rPants, coatMat);
 
-            GameObject rBoot = CreatePrimitive(PrimitiveType.Cube, "R_Boot", rightLeg.transform);
-            rBoot.transform.localPosition = new Vector3(0, -0.68f, 0.05f);
-            rBoot.transform.localScale = new Vector3(0.17f, 0.15f, 0.26f);
-            SetMaterial(rBoot, bootMat);
+            // Right Kirza Boot (Shaft, Foot, Heel, Sole)
+            BuildBoot(rightLeg.transform, bootMat);
 
             return root;
+        }
+
+        private static void BuildHand(Transform armParent, Material gloveMat, bool isLeft)
+        {
+            // Wrist Cuff
+            GameObject cuff = CreatePrimitive(PrimitiveType.Cylinder, "WristCuff", armParent);
+            cuff.transform.localPosition = new Vector3(0, -0.42f, 0);
+            cuff.transform.localScale = new Vector3(0.12f, 0.03f, 0.12f);
+            SetMaterial(cuff, gloveMat);
+
+            // Palm (flat rounded box)
+            GameObject palm = CreatePrimitive(PrimitiveType.Cube, "Palm", armParent);
+            palm.transform.localPosition = new Vector3(0, -0.48f, 0.02f);
+            palm.transform.localScale = new Vector3(0.09f, 0.10f, 0.05f);
+            SetMaterial(palm, gloveMat);
+
+            // Thumb (angled outward)
+            float thumbSide = isLeft ? 0.055f : -0.055f;
+            GameObject thumb = CreatePrimitive(PrimitiveType.Capsule, "Thumb", armParent);
+            thumb.transform.localPosition = new Vector3(thumbSide, -0.47f, 0.04f);
+            thumb.transform.localRotation = Quaternion.Euler(20f, isLeft ? 30f : -30f, 0);
+            thumb.transform.localScale = new Vector3(0.035f, 0.045f, 0.035f);
+            SetMaterial(thumb, gloveMat);
+
+            // Fingers (curled forward naturally)
+            GameObject fingers = CreatePrimitive(PrimitiveType.Capsule, "Fingers", armParent);
+            fingers.transform.localPosition = new Vector3(0, -0.54f, 0.03f);
+            fingers.transform.localRotation = Quaternion.Euler(35f, 0, 0);
+            fingers.transform.localScale = new Vector3(0.08f, 0.05f, 0.045f);
+            SetMaterial(fingers, gloveMat);
+        }
+
+        private static void BuildBoot(Transform legParent, Material bootMat)
+        {
+            // Kirza Boot Shaft
+            GameObject shaft = CreatePrimitive(PrimitiveType.Cylinder, "BootShaft", legParent);
+            shaft.transform.localPosition = new Vector3(0, -0.48f, 0);
+            shaft.transform.localScale = new Vector3(0.15f, 0.16f, 0.15f);
+            SetMaterial(shaft, bootMat);
+
+            // Foot Base
+            GameObject foot = CreatePrimitive(PrimitiveType.Cube, "BootFoot", legParent);
+            foot.transform.localPosition = new Vector3(0, -0.66f, 0.05f);
+            foot.transform.localScale = new Vector3(0.13f, 0.10f, 0.24f);
+            SetMaterial(foot, bootMat);
+
+            // Sole & Heel
+            GameObject sole = CreatePrimitive(PrimitiveType.Cube, "BootSole", legParent);
+            sole.transform.localPosition = new Vector3(0, -0.72f, 0.05f);
+            sole.transform.localScale = new Vector3(0.14f, 0.03f, 0.25f);
+            SetMaterial(sole, bootMat);
+
+            GameObject heel = CreatePrimitive(PrimitiveType.Cube, "BootHeel", legParent);
+            heel.transform.localPosition = new Vector3(0, -0.72f, -0.04f);
+            heel.transform.localScale = new Vector3(0.14f, 0.05f, 0.08f);
+            SetMaterial(heel, bootMat);
         }
 
         private static void BuildHat(HatType hatType, Transform head, Material hatMat, Material accentMat)
@@ -261,57 +388,100 @@ namespace PotatoCoop.Puppet
             {
                 case HatType.ChefToque:
                 {
-                    // Cylindrical headband
+                    // Headband
                     GameObject band = CreatePrimitive(PrimitiveType.Cylinder, "ChefBand", head);
-                    band.transform.localPosition = new Vector3(0, 0.22f, 0);
-                    band.transform.localScale = new Vector3(0.44f, 0.05f, 0.44f);
-                    SetMaterial(band, accentMat);
+                    band.transform.localPosition = new Vector3(0, 0.18f, 0);
+                    band.transform.localScale = new Vector3(0.38f, 0.05f, 0.38f);
+                    SetMaterial(band, hatMat);
 
-                    // Puffy crown
-                    GameObject puff = CreatePrimitive(PrimitiveType.Sphere, "ChefPuff", head);
-                    puff.transform.localPosition = new Vector3(0, 0.42f, 0);
-                    puff.transform.localScale = new Vector3(0.55f, 0.32f, 0.55f);
+                    // Golden Star Cockade Badge
+                    GameObject star = CreatePrimitive(PrimitiveType.Cube, "StarBadge", head);
+                    star.transform.localPosition = new Vector3(0, 0.18f, 0.20f);
+                    star.transform.localRotation = Quaternion.Euler(0, 0, 45f);
+                    star.transform.localScale = new Vector3(0.04f, 0.04f, 0.02f);
+                    SetMaterial(star, accentMat);
+
+                    // Pleated Puffy Crown
+                    GameObject puff = CreatePrimitive(PrimitiveType.Cylinder, "ChefCrown", head);
+                    puff.transform.localPosition = new Vector3(0, 0.34f, 0);
+                    puff.transform.localScale = new Vector3(0.42f, 0.16f, 0.42f);
                     SetMaterial(puff, hatMat);
+
+                    GameObject topPuff = CreatePrimitive(PrimitiveType.Sphere, "ChefTop", head);
+                    topPuff.transform.localPosition = new Vector3(0, 0.44f, 0);
+                    topPuff.transform.localScale = new Vector3(0.46f, 0.14f, 0.46f);
+                    SetMaterial(topPuff, hatMat);
                     break;
                 }
-                case HatType.Beret:
+                case HatType.SovietUshanka:
                 {
-                    GameObject beret = CreatePrimitive(PrimitiveType.Cylinder, "Beret", head);
-                    beret.transform.localPosition = new Vector3(0.04f, 0.24f, 0);
-                    beret.transform.localRotation = Quaternion.Euler(12f, 0, -15f);
-                    beret.transform.localScale = new Vector3(0.52f, 0.08f, 0.52f);
-                    SetMaterial(beret, hatMat);
+                    // Cap Base
+                    GameObject cap = CreatePrimitive(PrimitiveType.Sphere, "UshankaBase", head);
+                    cap.transform.localPosition = new Vector3(0, 0.16f, 0);
+                    cap.transform.localScale = new Vector3(0.40f, 0.26f, 0.38f);
+                    SetMaterial(cap, hatMat);
 
-                    GameObject stem = CreatePrimitive(PrimitiveType.Sphere, "BeretStem", head);
-                    stem.transform.localPosition = new Vector3(0.05f, 0.32f, 0);
-                    stem.transform.localScale = new Vector3(0.04f, 0.04f, 0.04f);
-                    SetMaterial(stem, accentMat);
+                    // Front Fur Flap with Soviet Red Star
+                    GameObject frontFlap = CreatePrimitive(PrimitiveType.Cube, "FrontFlap", head);
+                    frontFlap.transform.localPosition = new Vector3(0, 0.19f, 0.17f);
+                    frontFlap.transform.localScale = new Vector3(0.26f, 0.14f, 0.06f);
+                    SetMaterial(frontFlap, hatMat);
+
+                    GameObject redStar = CreatePrimitive(PrimitiveType.Cube, "RedStar", head);
+                    redStar.transform.localPosition = new Vector3(0, 0.20f, 0.21f);
+                    redStar.transform.localRotation = Quaternion.Euler(0, 0, 45f);
+                    redStar.transform.localScale = new Vector3(0.05f, 0.05f, 0.02f);
+                    SetMaterial(redStar, accentMat);
+
+                    // Left & Right Ear Flaps (tied up)
+                    GameObject earFlapL = CreatePrimitive(PrimitiveType.Cube, "EarFlapL", head);
+                    earFlapL.transform.localPosition = new Vector3(-0.19f, 0.16f, 0);
+                    earFlapL.transform.localScale = new Vector3(0.06f, 0.18f, 0.22f);
+                    SetMaterial(earFlapL, hatMat);
+
+                    GameObject earFlapR = CreatePrimitive(PrimitiveType.Cube, "EarFlapR", head);
+                    earFlapR.transform.localPosition = new Vector3(0.19f, 0.16f, 0);
+                    earFlapR.transform.localScale = new Vector3(0.06f, 0.18f, 0.22f);
+                    SetMaterial(earFlapR, hatMat);
                     break;
                 }
                 case HatType.SafetyHelmet:
                 {
-                    GameObject helmet = CreatePrimitive(PrimitiveType.Sphere, "Helmet", head);
-                    helmet.transform.localPosition = new Vector3(0, 0.20f, 0);
-                    helmet.transform.localScale = new Vector3(0.48f, 0.35f, 0.50f);
+                    // Domed Helmet
+                    GameObject helmet = CreatePrimitive(PrimitiveType.Sphere, "HelmetDome", head);
+                    helmet.transform.localPosition = new Vector3(0, 0.18f, 0);
+                    helmet.transform.localScale = new Vector3(0.42f, 0.26f, 0.44f);
                     SetMaterial(helmet, hatMat);
 
-                    GameObject lamp = CreatePrimitive(PrimitiveType.Cube, "HeadLamp", head);
-                    lamp.transform.localPosition = new Vector3(0, 0.24f, 0.25f);
-                    lamp.transform.localScale = new Vector3(0.08f, 0.06f, 0.06f);
+                    // Visor Brim
+                    GameObject brim = CreatePrimitive(PrimitiveType.Cylinder, "HelmetBrim", head);
+                    brim.transform.localPosition = new Vector3(0, 0.12f, 0.06f);
+                    brim.transform.localScale = new Vector3(0.44f, 0.02f, 0.46f);
+                    SetMaterial(brim, hatMat);
+
+                    // Headlamp
+                    GameObject lamp = CreatePrimitive(PrimitiveType.Cylinder, "HeadLamp", head);
+                    lamp.transform.localPosition = new Vector3(0, 0.20f, 0.22f);
+                    lamp.transform.localRotation = Quaternion.Euler(90f, 0, 0);
+                    lamp.transform.localScale = new Vector3(0.08f, 0.04f, 0.08f);
                     SetMaterial(lamp, accentMat);
                     break;
                 }
-                case HatType.BakerCap:
+                case HatType.WorkerCap:
                 {
-                    GameObject cap = CreatePrimitive(PrimitiveType.Cube, "BakerCap", head);
-                    cap.transform.localPosition = new Vector3(0, 0.26f, 0);
-                    cap.transform.localScale = new Vector3(0.24f, 0.16f, 0.42f);
+                    // Peaked Flat Cap (Кепка-восьмиклинка)
+                    GameObject cap = CreatePrimitive(PrimitiveType.Cylinder, "FlatCap", head);
+                    cap.transform.localPosition = new Vector3(0, 0.18f, -0.02f);
+                    cap.transform.localRotation = Quaternion.Euler(10f, 0, 0);
+                    cap.transform.localScale = new Vector3(0.40f, 0.10f, 0.42f);
                     SetMaterial(cap, hatMat);
 
-                    GameObject stripe = CreatePrimitive(PrimitiveType.Cube, "CapStripe", head);
-                    stripe.transform.localPosition = new Vector3(0, 0.22f, 0);
-                    stripe.transform.localScale = new Vector3(0.25f, 0.03f, 0.43f);
-                    SetMaterial(stripe, accentMat);
+                    // Visor
+                    GameObject visor = CreatePrimitive(PrimitiveType.Cube, "CapVisor", head);
+                    visor.transform.localPosition = new Vector3(0, 0.14f, 0.19f);
+                    visor.transform.localRotation = Quaternion.Euler(15f, 0, 0);
+                    visor.transform.localScale = new Vector3(0.24f, 0.02f, 0.10f);
+                    SetMaterial(visor, accentMat);
                     break;
                 }
             }
@@ -323,32 +493,48 @@ namespace PotatoCoop.Puppet
             {
                 case FacialType.CurledMustache:
                 {
-                    GameObject mustacheL = CreatePrimitive(PrimitiveType.Cylinder, "Mustache_L", head);
-                    mustacheL.transform.localPosition = new Vector3(-0.08f, -0.06f, 0.21f);
-                    mustacheL.transform.localRotation = Quaternion.Euler(0, 20f, -25f);
-                    mustacheL.transform.localScale = new Vector3(0.03f, 0.07f, 0.03f);
-                    SetMaterial(mustacheL, hairMat);
+                    // Cossack curled handlebar mustache
+                    GameObject musL = CreatePrimitive(PrimitiveType.Cylinder, "Mustache_L", head);
+                    musL.transform.localPosition = new Vector3(-0.07f, -0.05f, 0.17f);
+                    musL.transform.localRotation = Quaternion.Euler(0, 25f, -30f);
+                    musL.transform.localScale = new Vector3(0.025f, 0.065f, 0.025f);
+                    SetMaterial(musL, hairMat);
 
-                    GameObject mustacheR = CreatePrimitive(PrimitiveType.Cylinder, "Mustache_R", head);
-                    mustacheR.transform.localPosition = new Vector3(0.08f, -0.06f, 0.21f);
-                    mustacheR.transform.localRotation = Quaternion.Euler(0, -20f, 25f);
-                    mustacheR.transform.localScale = new Vector3(0.03f, 0.07f, 0.03f);
-                    SetMaterial(mustacheR, hairMat);
+                    GameObject musR = CreatePrimitive(PrimitiveType.Cylinder, "Mustache_R", head);
+                    musR.transform.localPosition = new Vector3(0.07f, -0.05f, 0.17f);
+                    musR.transform.localRotation = Quaternion.Euler(0, -25f, 30f);
+                    musR.transform.localScale = new Vector3(0.025f, 0.065f, 0.025f);
+                    SetMaterial(musR, hairMat);
+                    break;
+                }
+                case FacialType.BushyMustache:
+                {
+                    // Solid Soviet worker's mustache
+                    GameObject mustache = CreatePrimitive(PrimitiveType.Cube, "BushyMustache", head);
+                    mustache.transform.localPosition = new Vector3(0, -0.05f, 0.175f);
+                    mustache.transform.localScale = new Vector3(0.15f, 0.04f, 0.03f);
+                    SetMaterial(mustache, hairMat);
                     break;
                 }
                 case FacialType.WeldingGoggles:
                 {
-                    GameObject gogglesL = CreatePrimitive(PrimitiveType.Cylinder, "Goggle_L", head);
-                    gogglesL.transform.localPosition = new Vector3(-0.11f, 0.14f, 0.20f);
-                    gogglesL.transform.localRotation = Quaternion.Euler(90f, 0, 0);
-                    gogglesL.transform.localScale = new Vector3(0.09f, 0.03f, 0.09f);
-                    SetMaterial(gogglesL, metalMat);
+                    // Forehead Welding Goggles
+                    GameObject strap = CreatePrimitive(PrimitiveType.Cylinder, "GoggleStrap", head);
+                    strap.transform.localPosition = new Vector3(0, 0.10f, 0);
+                    strap.transform.localScale = new Vector3(0.38f, 0.02f, 0.36f);
+                    SetMaterial(strap, hairMat);
 
-                    GameObject gogglesR = CreatePrimitive(PrimitiveType.Cylinder, "Goggle_R", head);
-                    gogglesR.transform.localPosition = new Vector3(0.11f, 0.14f, 0.20f);
-                    gogglesR.transform.localRotation = Quaternion.Euler(90f, 0, 0);
-                    gogglesR.transform.localScale = new Vector3(0.09f, 0.03f, 0.09f);
-                    SetMaterial(gogglesR, metalMat);
+                    GameObject goggleL = CreatePrimitive(PrimitiveType.Cylinder, "Goggle_L", head);
+                    goggleL.transform.localPosition = new Vector3(-0.09f, 0.10f, 0.17f);
+                    goggleL.transform.localRotation = Quaternion.Euler(90f, 0, 0);
+                    goggleL.transform.localScale = new Vector3(0.075f, 0.03f, 0.075f);
+                    SetMaterial(goggleL, metalMat);
+
+                    GameObject goggleR = CreatePrimitive(PrimitiveType.Cylinder, "Goggle_R", head);
+                    goggleR.transform.localPosition = new Vector3(0.09f, 0.10f, 0.17f);
+                    goggleR.transform.localRotation = Quaternion.Euler(90f, 0, 0);
+                    goggleR.transform.localScale = new Vector3(0.075f, 0.03f, 0.075f);
+                    SetMaterial(goggleR, metalMat);
                     break;
                 }
                 default:
@@ -358,14 +544,13 @@ namespace PotatoCoop.Puppet
 
         public static GameObject BuildToolProp(int toolId, Transform parent)
         {
-            // 0: Hand, 1: Bucket, 2: Vacuum, 3: Flamethrower, 4: Knife/Peeler
             GameObject prop = new GameObject($"ToolProp_{toolId}");
             prop.transform.SetParent(parent, false);
 
             Shader shader = Shader.Find("Universal Render Pipeline/Lit") ?? Shader.Find("Standard") ?? Shader.Find("Diffuse");
-            Material metalMat = CreateMaterial(shader, new Color(0.7f, 0.72f, 0.75f));
-            Material darkMat = CreateMaterial(shader, new Color(0.2f, 0.2f, 0.2f));
-            Material woodMat = CreateMaterial(shader, new Color(0.55f, 0.35f, 0.18f));
+            Material metalMat = CreateMaterial(shader, new Color(0.65f, 0.68f, 0.70f), 0.40f, 0.75f);
+            Material darkMat = CreateMaterial(shader, new Color(0.20f, 0.20f, 0.20f), 0.05f);
+            Material woodMat = CreateMaterial(shader, new Color(0.50f, 0.32f, 0.16f), 0.05f);
 
             switch (toolId)
             {
@@ -373,7 +558,7 @@ namespace PotatoCoop.Puppet
                 {
                     GameObject b = CreatePrimitive(PrimitiveType.Cylinder, "BucketBody", prop.transform);
                     b.transform.localPosition = new Vector3(0, -0.15f, 0);
-                    b.transform.localScale = new Vector3(0.28f, 0.18f, 0.28f);
+                    b.transform.localScale = new Vector3(0.26f, 0.16f, 0.26f);
                     SetMaterial(b, metalMat);
                     break;
                 }
@@ -409,8 +594,8 @@ namespace PotatoCoop.Puppet
                 {
                     GameObject potato = CreatePrimitive(PrimitiveType.Sphere, "HeldPotato", prop.transform);
                     potato.transform.localPosition = new Vector3(0, 0, 0.12f);
-                    potato.transform.localScale = new Vector3(0.18f, 0.24f, 0.18f);
-                    SetMaterial(potato, CreateMaterial(shader, new Color(0.72f, 0.54f, 0.32f)));
+                    potato.transform.localScale = new Vector3(0.16f, 0.22f, 0.16f);
+                    SetMaterial(potato, CreateMaterial(shader, new Color(0.68f, 0.50f, 0.28f), 0.04f));
                     break;
                 }
                 case 11: // Carrying Sack of potatoes
@@ -418,8 +603,8 @@ namespace PotatoCoop.Puppet
                     GameObject sack = CreatePrimitive(PrimitiveType.Cylinder, "HeldSack", prop.transform);
                     sack.transform.localPosition = new Vector3(0, -0.05f, 0.20f);
                     sack.transform.localRotation = Quaternion.Euler(75f, 0, 0);
-                    sack.transform.localScale = new Vector3(0.32f, 0.45f, 0.32f);
-                    SetMaterial(sack, CreateMaterial(shader, new Color(0.62f, 0.50f, 0.36f)));
+                    sack.transform.localScale = new Vector3(0.30f, 0.42f, 0.30f);
+                    SetMaterial(sack, CreateMaterial(shader, new Color(0.58f, 0.46f, 0.32f), 0.04f));
                     break;
                 }
                 case 4: // Peeling Knife / Y-Peeler
@@ -428,12 +613,12 @@ namespace PotatoCoop.Puppet
                     GameObject handle = CreatePrimitive(PrimitiveType.Cylinder, "KnifeHandle", prop.transform);
                     handle.transform.localPosition = new Vector3(0, 0, 0.05f);
                     handle.transform.localRotation = Quaternion.Euler(90f, 0, 0);
-                    handle.transform.localScale = new Vector3(0.04f, 0.10f, 0.04f);
+                    handle.transform.localScale = new Vector3(0.035f, 0.09f, 0.035f);
                     SetMaterial(handle, woodMat);
 
                     GameObject blade = CreatePrimitive(PrimitiveType.Cube, "KnifeBlade", prop.transform);
-                    blade.transform.localPosition = new Vector3(0, 0, 0.22f);
-                    blade.transform.localScale = new Vector3(0.01f, 0.05f, 0.16f);
+                    blade.transform.localPosition = new Vector3(0, 0, 0.20f);
+                    blade.transform.localScale = new Vector3(0.01f, 0.045f, 0.15f);
                     SetMaterial(blade, metalMat);
                     break;
                 }
@@ -448,7 +633,7 @@ namespace PotatoCoop.Puppet
             obj.name = name;
             obj.transform.SetParent(parent, false);
 
-            // Strip colliders so remote puppet doesn't collide with the local player or physics
+            // Strip colliders so remote puppet never interferes with physics
             Collider col = obj.GetComponent<Collider>();
             if (col != null)
                 GameObject.Destroy(col);
@@ -456,10 +641,15 @@ namespace PotatoCoop.Puppet
             return obj;
         }
 
-        private static Material CreateMaterial(Shader shader, Color color)
+        private static Material CreateMaterial(Shader shader, Color color, float smoothness = 0.04f, float metallic = 0.0f)
         {
             Material mat = new Material(shader);
             mat.color = color;
+            if (mat.HasProperty("_BaseColor")) mat.SetColor("_BaseColor", color);
+            if (mat.HasProperty("_Color")) mat.SetColor("_Color", color);
+            if (mat.HasProperty("_Smoothness")) mat.SetFloat("_Smoothness", smoothness);
+            if (mat.HasProperty("_Glossiness")) mat.SetFloat("_Glossiness", smoothness);
+            if (mat.HasProperty("_Metallic")) mat.SetFloat("_Metallic", metallic);
             return mat;
         }
 

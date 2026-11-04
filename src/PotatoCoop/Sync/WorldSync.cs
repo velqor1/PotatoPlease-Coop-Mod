@@ -17,6 +17,8 @@ namespace PotatoCoop.Sync
         public static bool IsSyncingDoor = false;
         public static bool IsSyncingSack = false;
         public static bool IsSyncingQuest = false;
+        public static bool IsSyncingCleanPotato = false;
+        public static bool IsSyncingRawPotato = false;
 
         public static void Initialize()
         {
@@ -210,6 +212,11 @@ namespace PotatoCoop.Sync
                 if (upMgr != null)
                 {
                     IsSyncingUpgrade = true;
+                    if (upgradeId >= 0 && upgradeId < PotatoCoopMod.KnownUpgradeLevels.Length)
+                    {
+                        PotatoCoopMod.KnownUpgradeLevels[upgradeId] = level;
+                    }
+
                     upMgr.DebugSetLevel((UpgradeId)upgradeId, level);
                     upMgr.ApplyAll();
 
@@ -225,6 +232,8 @@ namespace PotatoCoop.Sync
                             {
                                 p.RefreshAll();
                                 p.BuildRows();
+                                p.ApplyFilter();
+                                p.RefreshDetails();
                             }
                         }
                     }
@@ -248,19 +257,28 @@ namespace PotatoCoop.Sync
             try
             {
                 IsSyncingSack = true;
-                var sacks = GameObject.FindObjectsOfType<PatatoSackInteractable>();
-                if (sacks != null && sackIndex >= 0 && sackIndex < sacks.Length)
+                PatatoSackInteractable sack = null;
+                if (PatatoSackInteractable.All != null && sackIndex >= 0 && sackIndex < PatatoSackInteractable.All.Count)
                 {
-                    var sack = sacks[sackIndex];
-                    if (sack != null)
+                    sack = PatatoSackInteractable.All[sackIndex];
+                }
+                else
+                {
+                    var sacks = GameObject.FindObjectsOfType<PatatoSackInteractable>();
+                    if (sacks != null && sackIndex >= 0 && sackIndex < sacks.Length)
                     {
-                        // Spill all potatoes out on the floor and rip sack!
-                        try { sack.RipByHand(false); } catch { }
-                        try { sack.sack?.Rip(); } catch { }
-                        try { sack.sack?.SpillPotatoes(1f, true); } catch { }
-                        try { sack.Discard(); } catch { }
-                        MelonLogger.Msg($"[WorldSync] Synced ripped potato sack #{sackIndex} and spilled potatoes on floor!");
+                        sack = sacks[sackIndex];
                     }
+                }
+
+                if (sack != null)
+                {
+                    // Trigger authentic sack flip and rip physics animation!
+                    try { sack.FlipAndRip(); } catch { }
+                    try { sack.RipByHand(false); } catch { }
+                    try { sack.sack?.Rip(); } catch { }
+                    try { sack.sack?.SpillPotatoes(1f, true); } catch { }
+                    MelonLogger.Msg($"[WorldSync] Synced FlipAndRip for potato sack #{sackIndex}!");
                 }
             }
             catch (Exception ex)
@@ -277,17 +295,60 @@ namespace PotatoCoop.Sync
         {
             try
             {
+                IsSyncingCleanPotato = true;
                 var stations = GameObject.FindObjectsOfType<Workstation>();
                 if (stations != null && workstationIndex >= 0 && workstationIndex < stations.Length)
                 {
                     var ws = stations[workstationIndex];
                     if (ws != null)
                     {
-                        var potato = ws.GetComponentInChildren<PotatoInstance>();
+                        // 1. Try to take next raw potato from the workstation
+                        PotatoInstance potato = null;
+                        try
+                        {
+                            potato = ws.TakeNextRaw(5.0f, ws.transform.position);
+                        }
+                        catch { }
+
+                        // 2. If null, search PotatoInstance.All for nearest potato to workstation
+                        if (potato == null && PotatoInstance.All != null)
+                        {
+                            float minDist = 5.0f;
+                            for (int i = 0; i < PotatoInstance.All.Count; i++)
+                            {
+                                var p = PotatoInstance.All[i];
+                                if (p != null && !p.IsHeld && !p.IsCarried)
+                                {
+                                    float d = Vector3.Distance(p.transform.position, ws.transform.position);
+                                    if (d < minDist)
+                                    {
+                                        minDist = d;
+                                        potato = p;
+                                    }
+                                }
+                            }
+                        }
+
                         if (potato != null)
                         {
+                            // Strip skin and place cleanly in collection trough
+                            try { potato.EnsureMachinePeeled(1f); } catch { }
+                            try { potato.MarkPeelCounted(); } catch { }
                             ws.PlaceClean(potato, true);
+                            MelonLogger.Msg($"[WorldSync] Synced peeled potato into clean trough on workstation #{workstationIndex}!");
                         }
+
+                        // Bump quest progress for both players
+                        try
+                        {
+                            var qm = QuestManager.Instance ?? GameObject.FindObjectOfType<QuestManager>();
+                            if (qm != null)
+                            {
+                                qm.Bump(ObjectiveKind.PeelCount, 1);
+                                qm.Bump(ObjectiveKind.SellCount, 1);
+                            }
+                        }
+                        catch { }
                     }
                 }
             }
@@ -295,12 +356,17 @@ namespace PotatoCoop.Sync
             {
                 MelonLogger.Error($"[WorldSync] Error syncing clean potato: {ex.Message}");
             }
+            finally
+            {
+                IsSyncingCleanPotato = false;
+            }
         }
 
         private void HandlePotatoRaw(int workstationIndex)
         {
             try
             {
+                IsSyncingRawPotato = true;
                 var stations = GameObject.FindObjectsOfType<Workstation>();
                 if (stations != null && workstationIndex >= 0 && workstationIndex < stations.Length)
                 {
@@ -327,6 +393,10 @@ namespace PotatoCoop.Sync
             catch (Exception ex)
             {
                 MelonLogger.Error($"[WorldSync] Error syncing raw potato: {ex.Message}");
+            }
+            finally
+            {
+                IsSyncingRawPotato = false;
             }
         }
 
@@ -601,6 +671,7 @@ namespace PotatoCoop.Sync
     {
         public static void Postfix(Workstation __instance)
         {
+            if (WorldSync.IsSyncingCleanPotato) return;
             if (SteamNetManager.Instance != null && (SteamNetManager.Instance.IsConnected || SteamNetManager.Instance.IsHost))
             {
                 var stations = GameObject.FindObjectsOfType<Workstation>();
@@ -672,6 +743,7 @@ namespace PotatoCoop.Sync
     {
         public static void Postfix(Workstation __instance)
         {
+            if (WorldSync.IsSyncingRawPotato) return;
             if (SteamNetManager.Instance != null && (SteamNetManager.Instance.IsConnected || SteamNetManager.Instance.IsHost))
             {
                 var stations = GameObject.FindObjectsOfType<Workstation>();

@@ -23,6 +23,9 @@ namespace PotatoCoop
         private float _sendTimer = 0f;
         private const float SEND_INTERVAL = 0.05f; // 20 Hz update rate for smooth movement
         public static long LastBalance = -999999;
+        public static readonly int[] KnownUpgradeLevels = new int[45];
+        private static bool _upgradesInitialized = false;
+        private float _upgradePollTimer = 0f;
 
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         private static extern IntPtr LoadLibraryW(string lpLibFileName);
@@ -126,6 +129,49 @@ namespace PotatoCoop
                     }
                 }
                 catch { }
+
+                // Real-time Upgrade Synchronization check (0.25s interval)
+                _upgradePollTimer += Time.deltaTime;
+                if (_upgradePollTimer >= 0.25f)
+                {
+                    _upgradePollTimer = 0f;
+                    try
+                    {
+                        var upMgr = UpgradeManager.Instance;
+                        if (upMgr != null && !WorldSync.IsSyncingUpgrade)
+                        {
+                            if (!_upgradesInitialized)
+                            {
+                                for (int i = 0; i <= 41; i++)
+                                {
+                                    KnownUpgradeLevels[i] = upMgr.GetLevel((UpgradeId)i);
+                                }
+                                _upgradesInitialized = true;
+                            }
+                            else
+                            {
+                                for (int i = 0; i <= 41; i++)
+                                {
+                                    int lvl = upMgr.GetLevel((UpgradeId)i);
+                                    if (lvl != KnownUpgradeLevels[i])
+                                    {
+                                        KnownUpgradeLevels[i] = lvl;
+                                        MelonLogger.Msg($"[UpgradeSync] Local upgrade changed: {(UpgradeId)i} -> Lvl {lvl}, broadcasting!");
+                                        WorldSync.Instance?.SendUpgradeUpdate(i, lvl);
+
+                                        // Also ensure economy is sent if balance changed from purchase
+                                        if (EconomyManager.Instance != null)
+                                        {
+                                            LastBalance = EconomyManager.Instance.Balance;
+                                            WorldSync.Instance?.SendEconomyUpdate(LastBalance);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    catch { }
+                }
             }
 
             // Stream local player transform to peers

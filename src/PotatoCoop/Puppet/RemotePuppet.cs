@@ -33,6 +33,7 @@ namespace PotatoCoop.Puppet
         // Procedural animation
         private float _walkCycle = 0f;
         private Text _nameplateText;
+        private bool _isVisualsEnabled = true;
 
         public void Initialize(ulong steamId, string playerName, int skinIndex)
         {
@@ -66,7 +67,7 @@ namespace PotatoCoop.Puppet
 
             GameObject canvasObj = new GameObject("NameplateCanvas");
             canvasObj.transform.SetParent(RootGameObject.transform, false);
-            canvasObj.transform.localPosition = new Vector3(0, 2.35f, 0);
+            canvasObj.transform.localPosition = new Vector3(0, 2.30f, 0);
 
             Canvas canvas = canvasObj.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.WorldSpace;
@@ -136,6 +137,20 @@ namespace PotatoCoop.Puppet
         {
             if (RootGameObject == null) return;
 
+            // When local player is actively peeling a potato, hide remote puppets from obscuring the cutting board
+            bool localPeeling = false;
+            try
+            {
+                var session = Il2CppPotatoPeeler.PeelSession.Instance;
+                if (session != null && session.IsActive)
+                {
+                    localPeeling = true;
+                }
+            }
+            catch { }
+
+            SetVisualsVisible(!localPeeling);
+
             // Smooth position & body rotation interpolation
             RootGameObject.transform.position = Vector3.Lerp(RootGameObject.transform.position, _targetPosition, dt * 15f);
             RootGameObject.transform.rotation = Quaternion.Slerp(RootGameObject.transform.rotation, Quaternion.Euler(0, _targetYaw, 0), dt * 15f);
@@ -156,11 +171,31 @@ namespace PotatoCoop.Puppet
             AnimateLocomotion(dt);
         }
 
+        private void SetVisualsVisible(bool visible)
+        {
+            if (_isVisualsEnabled == visible) return;
+            _isVisualsEnabled = visible;
+
+            if (RootGameObject == null) return;
+
+            Transform body = RootGameObject.transform.Find("VisualBody");
+            if (body != null)
+            {
+                body.gameObject.SetActive(visible);
+            }
+
+            Transform np = RootGameObject.transform.Find("NameplateCanvas");
+            if (np != null)
+            {
+                np.gameObject.SetActive(visible);
+            }
+        }
+
         private void AnimateLocomotion(float dt)
         {
             if (_isInteracting)
             {
-                // Active peeling animation at cutting board!
+                // Peeling animation at workstation cutting board
                 float peelMotion = Mathf.Sin(Time.time * 8.5f) * 16f;
                 if (_leftArmTransform != null)
                     _leftArmTransform.localRotation = Quaternion.Euler(-50f, 22f, 0);

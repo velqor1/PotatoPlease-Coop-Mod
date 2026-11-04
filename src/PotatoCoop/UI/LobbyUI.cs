@@ -15,6 +15,7 @@ namespace PotatoCoop.UI
 
         private List<LobbyInfo> _availableLobbies = new List<LobbyInfo>();
         private string _statusMessage = "Готов к подключению через Steam Spacewar (AppID 480)";
+        private bool _showSaveSelector = false;
 
         private Texture2D _bgTex;
         private Texture2D _cardTex;
@@ -173,19 +174,79 @@ namespace PotatoCoop.UI
 
                 if (SteamNetManager.Instance.IsHost)
                 {
-                    GUI.color = new Color(0.95f, 0.70f, 0.20f);
-                    if (DrawBtn(new Rect(colLeft + 15, btnY, leftW - 30, 42), "▶ НАЧАТЬ СМЕНУ ВСЕМ"))
+                    var mmc = GameObject.FindObjectOfType<MainMenuController>();
+                    if (mmc != null)
                     {
-                        IsVisible = false;
-                        SteamNetManager.Instance.BroadcastStartShift();
-                        var mmc = GameObject.FindObjectOfType<MainMenuController>();
-                        if (mmc != null)
+                        GUI.color = new Color(0.95f, 0.75f, 0.20f);
+                        if (DrawBtn(new Rect(colLeft + 15, btnY, leftW - 30, 36), "▶ ПРОДОЛЖИТЬ (ПОСЛЕДНЕЕ)"))
                         {
+                            IsVisible = false;
+                            SteamNetManager.Instance.BroadcastStartShift();
+                            mmc.ContinueShift();
+                        }
+                        GUI.color = Color.white;
+                        btnY += 40;
+
+                        if (_showSaveSelector)
+                        {
+                            if (DrawBtn(new Rect(colLeft + 15, btnY, leftW - 30, 28), "▲ ЗАКРЫТЬ СПИСОК"))
+                            {
+                                _showSaveSelector = false;
+                            }
+                            btnY += 32;
+
+                            for (int s = 0; s < 4; s++)
+                            {
+                                bool exists = false;
+                                try { exists = SaveSlots.Exists(s); } catch { }
+
+                                if (exists)
+                                {
+                                    string label = s == 0 ? "💾 Автосохранение" : $"💾 Слот #{s}";
+                                    if (DrawBtn(new Rect(colLeft + 20, btnY, leftW - 40, 28), $"{label} -> ЗАГРУЗИТЬ"))
+                                    {
+                                        IsVisible = false;
+                                        SteamNetManager.Instance.BroadcastStartShift();
+                                        mmc.LoadSlot(s);
+                                    }
+                                    btnY += 32;
+                                }
+                            }
+
+                            if (DrawBtn(new Rect(colLeft + 20, btnY, leftW - 40, 26), "📁 МЕНЮ СОХРАНЕНИЙ ИГРЫ"))
+                            {
+                                IsVisible = false;
+                                mmc.ShowSaves();
+                            }
+                            btnY += 30;
+                        }
+                        else
+                        {
+                            if (DrawBtn(new Rect(colLeft + 15, btnY, leftW - 30, 32), "💾 ВЫБРАТЬ СОХРАНЕНИЕ..."))
+                            {
+                                _showSaveSelector = true;
+                            }
+                            btnY += 36;
+                        }
+
+                        if (DrawBtn(new Rect(colLeft + 15, btnY, leftW - 30, 30), "★ НОВАЯ СМЕНА"))
+                        {
+                            IsVisible = false;
+                            SteamNetManager.Instance.BroadcastStartShift();
                             mmc.BeginShift();
                         }
+                        btnY += 35;
                     }
-                    GUI.color = Color.white;
-                    btnY += 48;
+                    else
+                    {
+                        GUI.color = new Color(0.95f, 0.70f, 0.20f);
+                        if (DrawBtn(new Rect(colLeft + 15, btnY, leftW - 30, 38), "▶ СИНХРОНИЗИРОВАТЬ СМЕНУ"))
+                        {
+                            SteamNetManager.Instance.BroadcastStartShift();
+                        }
+                        GUI.color = Color.white;
+                        btnY += 42;
+                    }
                 }
 
                 if (DrawBtn(new Rect(colLeft + 15, btnY, leftW - 30, 34), "ПОКИНУТЬ ЛОББИ"))
@@ -197,7 +258,7 @@ namespace PotatoCoop.UI
             }
 
             // Skin Selector
-            btnY = colTop + 245;
+            btnY = Mathf.Max(btnY + 10, colTop + 290);
             GUI.Label(new Rect(colLeft + 15, btnY, leftW - 30, 25), "<b>СПЕЦИАЛИЗАЦИЯ / СТИЛЬ:</b>");
             btnY += 28;
 

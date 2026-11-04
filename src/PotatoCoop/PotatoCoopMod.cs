@@ -337,6 +337,32 @@ namespace PotatoCoop
         }
     }
 
+    [HarmonyPatch(typeof(MainMenuController), "LoadSlot")]
+    public static class Patch_MainMenuController_LoadSlot
+    {
+        public static void Prefix(MainMenuController __instance, int slot)
+        {
+            if (SteamNetManager.Instance != null && SteamNetManager.Instance.IsHost)
+            {
+                MelonLogger.Msg($"[PotatoCoop] Host loaded save slot #{slot}, broadcasting to all peers!");
+                SteamNetManager.Instance.BroadcastStartShift();
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(SaveSlotsPanel), "LoadSlot")]
+    public static class Patch_SaveSlotsPanel_LoadSlot
+    {
+        public static void Prefix(SaveSlotsPanel __instance, int slot)
+        {
+            if (SteamNetManager.Instance != null && SteamNetManager.Instance.IsHost)
+            {
+                MelonLogger.Msg($"[PotatoCoop] Host loaded save slot #{slot} via SaveSlotsPanel, broadcasting to all peers!");
+                SteamNetManager.Instance.BroadcastStartShift();
+            }
+        }
+    }
+
     [HarmonyPatch(typeof(PauseUI), "Awake")]
     public static class Patch_PauseUI_Awake
     {

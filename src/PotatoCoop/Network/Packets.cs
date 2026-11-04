@@ -22,7 +22,8 @@ namespace PotatoCoop.Network
         PotatoClean = 14,
         QuestBump = 15,
         QuestFlag = 16,
-        QuestPage = 17
+        QuestPage = 17,
+        PotatoRaw = 18
     }
 
     public static class PacketSerializer
@@ -194,6 +195,15 @@ namespace PotatoCoop.Network
             using var writer = new BinaryWriter(ms);
             writer.Write((byte)PacketType.QuestPage);
             writer.Write(pageIndex);
+            return ms.ToArray();
+        }
+
+        public static byte[] SerializePotatoRaw(int workstationIndex)
+        {
+            using var ms = new MemoryStream();
+            using var writer = new BinaryWriter(ms);
+            writer.Write((byte)PacketType.PotatoRaw);
+            writer.Write(workstationIndex);
             return ms.ToArray();
         }
     }

@@ -5,6 +5,7 @@ using Il2CppSteamworks;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using UnityEngine;
 using MelonLoader;
+using Il2CppPotatoPeeler;
 
 namespace PotatoCoop.Network
 {
@@ -35,6 +36,7 @@ namespace PotatoCoop.Network
         public event Action<int, int> OnUpgradeSyncReceived;
         public event Action<int> OnSackRippedReceived;
         public event Action<int> OnPotatoCleanReceived;
+        public event Action<int> OnPotatoRawReceived;
         public event Action<int, long> OnQuestBumpReceived;
         public event Action<string> OnQuestFlagReceived;
         public event Action<int> OnQuestPageReceived;
@@ -185,6 +187,47 @@ namespace PotatoCoop.Network
                             int assignedSlot = ConnectedPeers.Count;
                             byte[] ack = PacketSerializer.SerializeHandshakeAck(assignedSlot, 0, 0);
                             SendPacketTo(sender, ack, true);
+
+                            // Sync current economy to the newly joined peer!
+                            try
+                            {
+                                if (EconomyManager.Instance != null)
+                                {
+                                    byte[] ecoPkt = PacketSerializer.SerializeEconomySync(EconomyManager.Instance.Balance);
+                                    SendPacketTo(sender, ecoPkt, true);
+                                }
+                            }
+                            catch { }
+
+                            // Sync all currently purchased upgrades to the newly joined peer!
+                            try
+                            {
+                                var upMgr = UpgradeManager.Instance;
+                                if (upMgr != null)
+                                {
+                                    foreach (UpgradeId upId in Enum.GetValues<UpgradeId>())
+                                    {
+                                        int lvl = upMgr.GetLevel(upId);
+                                        if (lvl > 0)
+                                        {
+                                            byte[] upPkt = PacketSerializer.SerializeUpgradeSync((int)upId, lvl);
+                                            SendPacketTo(sender, upPkt, true);
+                                        }
+                                    }
+                                }
+                            }
+                            catch { }
+
+                            // Sync current quest page!
+                            try
+                            {
+                                if (QuestManager.Instance != null)
+                                {
+                                    byte[] qPkt = PacketSerializer.SerializeQuestPage(QuestManager.Instance.ActiveIndex);
+                                    SendPacketTo(sender, qPkt, true);
+                                }
+                            }
+                            catch { }
 
                             // Broadcast this new peer to other peers
                             for (int i = 0; i < ConnectedPeers.Count; i++)
@@ -422,6 +465,22 @@ namespace PotatoCoop.Network
                     {
                         int page = reader.ReadInt32();
                         OnQuestPageReceived?.Invoke(page);
+
+                        if (IsHost)
+                        {
+                            for (int i = 0; i < ConnectedPeers.Count; i++)
+                            {
+                                if (ConnectedPeers[i] != sender)
+                                    SendPacketTo(ConnectedPeers[i], data, true);
+                            }
+                        }
+                        break;
+                    }
+
+                    case PacketType.PotatoRaw:
+                    {
+                        int wsIdx = reader.ReadInt32();
+                        OnPotatoRawReceived?.Invoke(wsIdx);
 
                         if (IsHost)
                         {

@@ -35,6 +35,7 @@ namespace PotatoCoop.Sync
             SteamNetManager.Instance.OnUpgradeSyncReceived += HandleUpgradeSync;
             SteamNetManager.Instance.OnSackRippedReceived += HandleSackRipped;
             SteamNetManager.Instance.OnPotatoCleanReceived += HandlePotatoClean;
+            SteamNetManager.Instance.OnPotatoRawReceived += HandlePotatoRaw;
             SteamNetManager.Instance.OnQuestBumpReceived += HandleQuestBump;
             SteamNetManager.Instance.OnQuestFlagReceived += HandleQuestFlag;
             SteamNetManager.Instance.OnQuestPageReceived += HandleQuestPage;
@@ -70,6 +71,12 @@ namespace PotatoCoop.Sync
         public void SendPotatoClean(int workstationIndex)
         {
             byte[] pkt = PacketSerializer.SerializePotatoClean(workstationIndex);
+            SteamNetManager.Instance.BroadcastPacket(pkt, true);
+        }
+
+        public void SendPotatoRaw(int workstationIndex)
+        {
+            byte[] pkt = PacketSerializer.SerializePotatoRaw(workstationIndex);
             SteamNetManager.Instance.BroadcastPacket(pkt, true);
         }
 
@@ -120,18 +127,28 @@ namespace PotatoCoop.Sync
                     var slidingDoors = GameObject.FindObjectsOfType<SlidingDoorInteractable>();
                     if (slidingDoors != null && doorId >= 0 && doorId < slidingDoors.Length)
                     {
-                        if (isOpen) slidingDoors[doorId].Open();
-                        else slidingDoors[doorId].Close();
+                        var sd = slidingDoors[doorId];
+                        sd.SetOpen(isOpen);
+                        if (isOpen) sd.Open();
+                        else sd.Close();
                     }
                 }
                 else
                 {
-                    var hingedDoors = GameObject.FindObjectsOfType<HingedDoor>();
-                    if (hingedDoors != null && doorId >= 0 && doorId < hingedDoors.Length)
+                    if (HingedDoor.All != null && doorId >= 0 && doorId < HingedDoor.All.Count)
                     {
-                        hingedDoors[doorId].SetOpen(isOpen, false);
+                        HingedDoor.All[doorId].SetOpen(isOpen, false);
+                    }
+                    else
+                    {
+                        var hingedDoors = GameObject.FindObjectsOfType<HingedDoor>();
+                        if (hingedDoors != null && doorId >= 0 && doorId < hingedDoors.Length)
+                        {
+                            hingedDoors[doorId].SetOpen(isOpen, false);
+                        }
                     }
                 }
+                MelonLogger.Msg($"[WorldSync] Synced door #{doorId} (isSliding: {isSliding}) -> Open: {isOpen}");
             }
             catch (Exception ex)
             {
@@ -151,7 +168,27 @@ namespace PotatoCoop.Sync
                 if (eco != null)
                 {
                     IsSyncingEconomy = true;
+                    PotatoCoopMod.LastBalance = moneyTotal;
                     eco.SetBalance(moneyTotal);
+                    eco.Balance = moneyTotal;
+
+                    try { eco.OnBalanceChanged?.Invoke(moneyTotal); } catch { }
+
+                    // Refresh all upgrade panels and shop UI
+                    try
+                    {
+                        var panels = GameObject.FindObjectsOfType<UpgradePanel>();
+                        if (panels != null)
+                        {
+                            foreach (var p in panels)
+                            {
+                                p.OnBalanceChanged(moneyTotal);
+                                p.RefreshAll();
+                            }
+                        }
+                    }
+                    catch { }
+
                     MelonLogger.Msg($"[WorldSync] Shared balance updated to: {moneyTotal} ₽");
                 }
             }
@@ -175,6 +212,24 @@ namespace PotatoCoop.Sync
                     IsSyncingUpgrade = true;
                     upMgr.DebugSetLevel((UpgradeId)upgradeId, level);
                     upMgr.ApplyAll();
+
+                    try { upMgr.OnUpgradesChanged?.Invoke(); } catch { }
+
+                    // Refresh all upgrade panels and shop UI
+                    try
+                    {
+                        var panels = GameObject.FindObjectsOfType<UpgradePanel>();
+                        if (panels != null)
+                        {
+                            foreach (var p in panels)
+                            {
+                                p.RefreshAll();
+                                p.BuildRows();
+                            }
+                        }
+                    }
+                    catch { }
+
                     MelonLogger.Msg($"[WorldSync] Shared upgrade unlocked: {(UpgradeId)upgradeId} -> Lvl {level}!");
                 }
             }
@@ -197,10 +252,14 @@ namespace PotatoCoop.Sync
                 if (sacks != null && sackIndex >= 0 && sackIndex < sacks.Length)
                 {
                     var sack = sacks[sackIndex];
-                    if (sack != null && !sack.RipStarted)
+                    if (sack != null)
                     {
-                        sack.Discard();
-                        MelonLogger.Msg($"[WorldSync] Synced ripped potato sack #{sackIndex}!");
+                        // Spill all potatoes out on the floor and rip sack!
+                        try { sack.RipByHand(false); } catch { }
+                        try { sack.sack?.Rip(); } catch { }
+                        try { sack.sack?.SpillPotatoes(1f, true); } catch { }
+                        try { sack.Discard(); } catch { }
+                        MelonLogger.Msg($"[WorldSync] Synced ripped potato sack #{sackIndex} and spilled potatoes on floor!");
                     }
                 }
             }
@@ -235,6 +294,39 @@ namespace PotatoCoop.Sync
             catch (Exception ex)
             {
                 MelonLogger.Error($"[WorldSync] Error syncing clean potato: {ex.Message}");
+            }
+        }
+
+        private void HandlePotatoRaw(int workstationIndex)
+        {
+            try
+            {
+                var stations = GameObject.FindObjectsOfType<Workstation>();
+                if (stations != null && workstationIndex >= 0 && workstationIndex < stations.Length)
+                {
+                    var ws = stations[workstationIndex];
+                    if (ws != null)
+                    {
+                        if (PotatoInstance.All != null && PotatoInstance.All.Count > 0)
+                        {
+                            for (int i = 0; i < PotatoInstance.All.Count; i++)
+                            {
+                                var p = PotatoInstance.All[i];
+                                if (p != null && !p.IsParked && !p.IsHeld && !p.IsCarried)
+                                {
+                                    ws.PlaceRaw(p);
+                                    break;
+                                }
+                            }
+                        }
+                        ws.CaptureIntoSlots();
+                        MelonLogger.Msg($"[WorldSync] Synced raw potato onto workstation #{workstationIndex}!");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Error($"[WorldSync] Error syncing raw potato: {ex.Message}");
             }
         }
 
@@ -303,6 +395,25 @@ namespace PotatoCoop.Sync
                 IsSyncingQuest = false;
             }
         }
+
+        public static void SyncSlidingDoor(SlidingDoorInteractable door, bool open)
+        {
+            if (SteamNetManager.Instance != null && (SteamNetManager.Instance.IsConnected || SteamNetManager.Instance.IsHost))
+            {
+                var doors = GameObject.FindObjectsOfType<SlidingDoorInteractable>();
+                if (doors != null)
+                {
+                    for (int i = 0; i < doors.Length; i++)
+                    {
+                        if (doors[i] == door)
+                        {
+                            Instance?.SendDoorState(i, open, true);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
     }
 
     // --- HARMONY PATCHES FOR INSTANT GAMEPLAY SYNCHRONIZATION ---
@@ -315,7 +426,36 @@ namespace PotatoCoop.Sync
             if (WorldSync.IsSyncingEconomy) return;
             if (SteamNetManager.Instance != null && (SteamNetManager.Instance.IsConnected || SteamNetManager.Instance.IsHost))
             {
+                PotatoCoopMod.LastBalance = value;
                 WorldSync.Instance?.SendEconomyUpdate(value);
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(EconomyManager), "AddIncome")]
+    public static class Patch_EconomyManager_AddIncome
+    {
+        public static void Postfix(EconomyManager __instance)
+        {
+            if (WorldSync.IsSyncingEconomy) return;
+            if (SteamNetManager.Instance != null && (SteamNetManager.Instance.IsConnected || SteamNetManager.Instance.IsHost))
+            {
+                PotatoCoopMod.LastBalance = __instance.Balance;
+                WorldSync.Instance?.SendEconomyUpdate(__instance.Balance);
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(EconomyManager), "TrySpend")]
+    public static class Patch_EconomyManager_TrySpend
+    {
+        public static void Postfix(EconomyManager __instance, bool __result)
+        {
+            if (WorldSync.IsSyncingEconomy) return;
+            if (__result && SteamNetManager.Instance != null && (SteamNetManager.Instance.IsConnected || SteamNetManager.Instance.IsHost))
+            {
+                PotatoCoopMod.LastBalance = __instance.Balance;
+                WorldSync.Instance?.SendEconomyUpdate(__instance.Balance);
             }
         }
     }
@@ -327,6 +467,27 @@ namespace PotatoCoop.Sync
         {
             if (WorldSync.IsSyncingUpgrade) return;
             if (__result && SteamNetManager.Instance != null && (SteamNetManager.Instance.IsConnected || SteamNetManager.Instance.IsHost))
+            {
+                int newLevel = __instance.GetLevel(id);
+                WorldSync.Instance?.SendUpgradeUpdate((int)id, newLevel);
+
+                // Deduct cost on both players
+                if (EconomyManager.Instance != null)
+                {
+                    PotatoCoopMod.LastBalance = EconomyManager.Instance.Balance;
+                    WorldSync.Instance?.SendEconomyUpdate(EconomyManager.Instance.Balance);
+                }
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(UpgradeManager), "GrantLevel")]
+    public static class Patch_UpgradeManager_GrantLevel
+    {
+        public static void Postfix(UpgradeManager __instance, UpgradeId id)
+        {
+            if (WorldSync.IsSyncingUpgrade) return;
+            if (SteamNetManager.Instance != null && (SteamNetManager.Instance.IsConnected || SteamNetManager.Instance.IsHost))
             {
                 int newLevel = __instance.GetLevel(id);
                 WorldSync.Instance?.SendUpgradeUpdate((int)id, newLevel);
@@ -364,26 +525,27 @@ namespace PotatoCoop.Sync
         public static void Postfix(SlidingDoorInteractable __instance)
         {
             if (WorldSync.IsSyncingDoor) return;
-            SyncSlidingDoor(__instance, true);
+            WorldSync.SyncSlidingDoor(__instance, true);
         }
+    }
 
-        private static void SyncSlidingDoor(SlidingDoorInteractable door, bool open)
+    [HarmonyPatch(typeof(SlidingDoorInteractable), "SetOpen")]
+    public static class Patch_SlidingDoor_SetOpen
+    {
+        public static void Postfix(SlidingDoorInteractable __instance, bool open)
         {
-            if (SteamNetManager.Instance != null && (SteamNetManager.Instance.IsConnected || SteamNetManager.Instance.IsHost))
-            {
-                var doors = GameObject.FindObjectsOfType<SlidingDoorInteractable>();
-                if (doors != null)
-                {
-                    for (int i = 0; i < doors.Length; i++)
-                    {
-                        if (doors[i] == door)
-                        {
-                            WorldSync.Instance?.SendDoorState(i, open, true);
-                            break;
-                        }
-                    }
-                }
-            }
+            if (WorldSync.IsSyncingDoor) return;
+            WorldSync.SyncSlidingDoor(__instance, open);
+        }
+    }
+
+    [HarmonyPatch(typeof(SlidingDoorInteractable), "Toggle")]
+    public static class Patch_SlidingDoor_Toggle
+    {
+        public static void Postfix(SlidingDoorInteractable __instance)
+        {
+            if (WorldSync.IsSyncingDoor) return;
+            WorldSync.SyncSlidingDoor(__instance, __instance.IsOpen);
         }
     }
 
@@ -473,6 +635,53 @@ namespace PotatoCoop.Sync
                         if (sacks[i] == __instance)
                         {
                             WorldSync.Instance?.SendSackRipped(i);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(PatatoSackInteractable), "RipByHand")]
+    public static class Patch_PatatoSack_RipByHand
+    {
+        public static void Postfix(PatatoSackInteractable __instance, bool __result)
+        {
+            if (WorldSync.IsSyncingSack) return;
+            if (__result && SteamNetManager.Instance != null && (SteamNetManager.Instance.IsConnected || SteamNetManager.Instance.IsHost))
+            {
+                var sacks = GameObject.FindObjectsOfType<PatatoSackInteractable>();
+                if (sacks != null)
+                {
+                    for (int i = 0; i < sacks.Length; i++)
+                    {
+                        if (sacks[i] == __instance)
+                        {
+                            WorldSync.Instance?.SendSackRipped(i);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(Workstation), "PlaceRaw")]
+    public static class Patch_Workstation_PlaceRaw
+    {
+        public static void Postfix(Workstation __instance)
+        {
+            if (SteamNetManager.Instance != null && (SteamNetManager.Instance.IsConnected || SteamNetManager.Instance.IsHost))
+            {
+                var stations = GameObject.FindObjectsOfType<Workstation>();
+                if (stations != null)
+                {
+                    for (int i = 0; i < stations.Length; i++)
+                    {
+                        if (stations[i] == __instance)
+                        {
+                            WorldSync.Instance?.SendPotatoRaw(i);
                             break;
                         }
                     }

@@ -22,6 +22,7 @@ namespace PotatoCoop
 
         private float _sendTimer = 0f;
         private const float SEND_INTERVAL = 0.05f; // 20 Hz update rate for smooth movement
+        public static long LastBalance = -999999;
 
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         private static extern IntPtr LoadLibraryW(string lpLibFileName);
@@ -100,6 +101,31 @@ namespace PotatoCoop
             catch
             {
                 // InputSystem fallback
+            }
+
+            // Real-time Economy Synchronization check
+            if (SteamNetManager.Instance != null && (SteamNetManager.Instance.IsConnected || SteamNetManager.Instance.IsHost))
+            {
+                try
+                {
+                    var eco = EconomyManager.Instance;
+                    if (eco != null && !WorldSync.IsSyncingEconomy)
+                    {
+                        long currentBal = eco.Balance;
+                        if (LastBalance == -999999)
+                        {
+                            LastBalance = currentBal;
+                        }
+                        else if (currentBal != LastBalance)
+                        {
+                            long diff = currentBal - LastBalance;
+                            LastBalance = currentBal;
+                            MelonLogger.Msg($"[Economy] Balance changed: {currentBal} (diff: {diff}), broadcasting!");
+                            WorldSync.Instance?.SendEconomyUpdate(currentBal);
+                        }
+                    }
+                }
+                catch { }
             }
 
             // Stream local player transform to peers

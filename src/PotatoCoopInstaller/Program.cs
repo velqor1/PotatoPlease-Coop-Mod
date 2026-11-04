@@ -127,21 +127,25 @@ namespace PotatoCoopInstaller
 
                 // 1. steam_appid.txt
                 string appidDst = Path.Combine(gamePath, "steam_appid.txt");
-                File.WriteAllText(appidDst, "480\n");
+                File.WriteAllText(appidDst, "480");
                 Console.WriteLine("  ✓ steam_appid.txt (AppID 480 Spacewar)");
 
-                // 2. steam_api64.dll (in PotatoPlease_Data\Plugins\x86_64\)
+                // 2. steam_api64.dll (in BOTH root and PotatoPlease_Data\Plugins\x86_64\)
                 string steamApiSrc = Path.Combine(basePayloadDir, "steam_api64.dll");
                 if (!File.Exists(steamApiSrc))
                     steamApiSrc = Path.Combine(basePayloadDir, "PotatoPlease_Data", "Plugins", "x86_64", "steam_api64.dll");
 
-                string pluginsDir = Path.Combine(gamePath, "PotatoPlease_Data", "Plugins", "x86_64");
-                if (!Directory.Exists(pluginsDir)) Directory.CreateDirectory(pluginsDir);
-
                 if (File.Exists(steamApiSrc))
                 {
+                    // Copy to game root
+                    File.Copy(steamApiSrc, Path.Combine(gamePath, "steam_api64.dll"), true);
+                    Console.WriteLine("  ✓ steam_api64.dll (в корне игры)");
+
+                    // Copy to PotatoPlease_Data/Plugins/x86_64/
+                    string pluginsDir = Path.Combine(gamePath, "PotatoPlease_Data", "Plugins", "x86_64");
+                    if (!Directory.Exists(pluginsDir)) Directory.CreateDirectory(pluginsDir);
                     File.Copy(steamApiSrc, Path.Combine(pluginsDir, "steam_api64.dll"), true);
-                    Console.WriteLine("  ✓ PotatoPlease_Data/Plugins/x86_64/steam_api64.dll");
+                    Console.WriteLine("  ✓ PotatoPlease_Data/Plugins/x86_64/steam_api64.dll (замена кряка/эмулятора)");
                 }
 
                 // 3. version.dll (MelonLoader proxy)
@@ -187,6 +191,25 @@ namespace PotatoCoopInstaller
   5. Создайте лобби и пригласите друзей через Steam или скопируйте ID!
   ==============================================================");
                 Console.ResetColor();
+
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine("\n[?] Для игры по сети Steam требует наличие лицензии Spacewar (AppID 480).");
+                Console.WriteLine("    Если вы или ваш друг ни разу не играли в пиратский кооператив Steam,");
+                Console.WriteLine("    нужно один раз зарегистрировать Spacewar в аккаунте Steam.");
+                Console.Write("    Открыть регистрацию Spacewar в клиенте Steam сейчас? (Y/n): ");
+                Console.ResetColor();
+
+                string spacewarReg = Console.ReadLine()?.Trim().ToLower();
+                if (string.IsNullOrEmpty(spacewarReg) || spacewarReg == "y" || spacewarReg == "yes" || spacewarReg == "д" || spacewarReg == "да")
+                {
+                    try
+                    {
+                        Process.Start(new ProcessStartInfo("steam://run/480") { UseShellExecute = true });
+                        Console.WriteLine("    [+] Команда отправлена в Steam. Если появится окно 'Установка Spacewar',");
+                        Console.WriteLine("        нажмите 'Отмена' — лицензия уже навсегда добавлена на ваш аккаунт!");
+                    }
+                    catch { }
+                }
 
                 Console.Write("\nЗапустить игру сейчас? (Y/n): ");
                 string start = Console.ReadLine()?.Trim().ToLower();

@@ -100,8 +100,16 @@ namespace PotatoCoop.UI
             }
 
             // Status strip
-            GUI.color = new Color(0.35f, 0.85f, 0.35f);
-            GUI.Label(new Rect(left + 20, top + 55, width - 40, 25), $"Статус: {_statusMessage}");
+            if (SteamNetManager.Instance != null && SteamNetManager.Instance.IsSteamInitialized)
+            {
+                GUI.color = new Color(0.35f, 0.85f, 0.35f);
+                GUI.Label(new Rect(left + 20, top + 55, width - 40, 25), $"[✓ Steam: {SteamNetManager.Instance.LocalPlayerName} (Spacewar 480)] {_statusMessage}");
+            }
+            else
+            {
+                GUI.color = new Color(1f, 0.35f, 0.35f);
+                GUI.Label(new Rect(left + 20, top + 55, width - 40, 25), "⚠ STEAM НЕ ПОДКЛЮЧЕН! Откройте Steam и добавьте Spacewar: Win+R -> steam://run/480");
+            }
             GUI.color = Color.white;
 
             // Content Area: Split Left (Controls) and Right (Roster)

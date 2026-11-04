@@ -38,6 +38,8 @@ namespace PotatoCoop.Network
         private Callback<P2PSessionRequest_t> _p2pSessionRequestCallback;
         private Callback<P2PSessionConnectFail_t> _p2pSessionConnectFailCallback;
 
+        public bool IsSteamInitialized { get; private set; } = false;
+
         public static void Initialize()
         {
             if (Instance == null)
@@ -51,9 +53,13 @@ namespace PotatoCoop.Network
         {
             try
             {
+                Environment.SetEnvironmentVariable("SteamAppId", "480");
+                Environment.SetEnvironmentVariable("SteamGameId", "480");
+
                 bool initialized = SteamAPI.Init();
                 if (initialized && SteamAPI.IsSteamRunning())
                 {
+                    IsSteamInitialized = true;
                     LocalSteamId = SteamUser.GetSteamID();
                     LocalPlayerName = SteamFriends.GetPersonaName();
                     MelonLogger.Msg($"[SteamNet] Logged into Steam as: {LocalPlayerName} (SteamID: {LocalSteamId.m_SteamID})");
@@ -63,11 +69,13 @@ namespace PotatoCoop.Network
                 }
                 else
                 {
-                    MelonLogger.Warning("[SteamNet] Steam is not running or SteamAPI could not be initialized.");
+                    IsSteamInitialized = false;
+                    MelonLogger.Warning("[SteamNet] Steam is not running or SteamAPI could not be initialized (AppID 480). Check if Steam client is open and Spacewar is registered via steam://run/480.");
                 }
             }
             catch (Exception ex)
             {
+                IsSteamInitialized = false;
                 MelonLogger.Error($"[SteamNet] Error initializing Steam: {ex.Message}");
             }
         }

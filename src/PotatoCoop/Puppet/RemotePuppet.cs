@@ -28,6 +28,7 @@ namespace PotatoCoop.Puppet
         private float _targetPitch;
         private float _speed;
         private bool _isCrouching;
+        private bool _isInteracting;
 
         // Procedural animation
         private float _walkCycle = 0f;
@@ -109,6 +110,7 @@ namespace PotatoCoop.Puppet
             _targetPitch = pitch;
             _speed = speed;
             _isCrouching = isCrouching;
+            _isInteracting = isInteracting;
 
             if (toolId != _currentToolId)
             {
@@ -156,6 +158,38 @@ namespace PotatoCoop.Puppet
 
         private void AnimateLocomotion(float dt)
         {
+            if (_isInteracting)
+            {
+                // Active peeling animation at cutting board!
+                float peelMotion = Mathf.Sin(Time.time * 8.5f) * 16f;
+                if (_leftArmTransform != null)
+                    _leftArmTransform.localRotation = Quaternion.Euler(-50f, 22f, 0);
+                if (_rightArmTransform != null)
+                    _rightArmTransform.localRotation = Quaternion.Euler(-55f + peelMotion, -18f, 0);
+                if (_leftLegTransform != null)
+                    _leftLegTransform.localRotation = Quaternion.identity;
+                if (_rightLegTransform != null)
+                    _rightLegTransform.localRotation = Quaternion.identity;
+                return;
+            }
+
+            if (_currentToolId == 10) // Holding potato
+            {
+                // Both arms forward holding potato
+                if (_leftArmTransform != null)
+                    _leftArmTransform.localRotation = Quaternion.Euler(-45f, 15f, 0);
+                if (_rightArmTransform != null)
+                    _rightArmTransform.localRotation = Quaternion.Euler(-45f, -15f, 0);
+            }
+            else if (_currentToolId == 11) // Carrying sack
+            {
+                // Both arms wrapped around heavy burlap sack
+                if (_leftArmTransform != null)
+                    _leftArmTransform.localRotation = Quaternion.Euler(-40f, 25f, 0);
+                if (_rightArmTransform != null)
+                    _rightArmTransform.localRotation = Quaternion.Euler(-40f, -25f, 0);
+            }
+
             if (_speed > 0.1f)
             {
                 _walkCycle += dt * _speed * 4.5f;
@@ -168,12 +202,15 @@ namespace PotatoCoop.Puppet
                 if (_rightLegTransform != null)
                     _rightLegTransform.localRotation = Quaternion.Euler(-legSwing, 0, 0);
 
-                if (_leftArmTransform != null)
-                    _leftArmTransform.localRotation = Quaternion.Euler(-armSwing, 0, 0);
-                if (_rightArmTransform != null)
-                    _rightArmTransform.localRotation = Quaternion.Euler(armSwing * 0.4f, 0, 0);
+                if (_currentToolId != 10 && _currentToolId != 11)
+                {
+                    if (_leftArmTransform != null)
+                        _leftArmTransform.localRotation = Quaternion.Euler(-armSwing, 0, 0);
+                    if (_rightArmTransform != null)
+                        _rightArmTransform.localRotation = Quaternion.Euler(armSwing * 0.4f, 0, 0);
+                }
             }
-            else
+            else if (_currentToolId != 10 && _currentToolId != 11)
             {
                 if (_leftLegTransform != null)
                     _leftLegTransform.localRotation = Quaternion.Slerp(_leftLegTransform.localRotation, Quaternion.identity, dt * 8f);

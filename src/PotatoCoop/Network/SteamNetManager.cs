@@ -30,8 +30,14 @@ namespace PotatoCoop.Network
         public event Action<int, long[], bool[]> OnQuestSyncReceived;
         public event Action<Vector3, float, float> OnVoxelCutReceived;
         public event Action<int, float, bool, int> OnMachineSyncReceived;
-        public event Action<int, bool> OnDoorSyncReceived;
-        public event Action<int> OnEconomySyncReceived;
+        public event Action<int, bool, bool> OnDoorSyncReceived;
+        public event Action<long> OnEconomySyncReceived;
+        public event Action<int, int> OnUpgradeSyncReceived;
+        public event Action<int> OnSackRippedReceived;
+        public event Action<int> OnPotatoCleanReceived;
+        public event Action<int, long> OnQuestBumpReceived;
+        public event Action<string> OnQuestFlagReceived;
+        public event Action<int> OnQuestPageReceived;
         public event Action<ulong, string, int> OnPeerJoined;
         public event Action<ulong> OnPeerLeft;
 
@@ -299,8 +305,9 @@ namespace PotatoCoop.Network
                     {
                         int dId = reader.ReadInt32();
                         bool op = reader.ReadBoolean();
+                        bool isSliding = (reader.BaseStream.Position < reader.BaseStream.Length) ? reader.ReadBoolean() : false;
 
-                        OnDoorSyncReceived?.Invoke(dId, op);
+                        OnDoorSyncReceived?.Invoke(dId, op, isSliding);
 
                         if (IsHost)
                         {
@@ -315,8 +322,106 @@ namespace PotatoCoop.Network
 
                     case PacketType.EconomySync:
                     {
-                        int total = reader.ReadInt32();
+                        long total = reader.ReadInt64();
                         OnEconomySyncReceived?.Invoke(total);
+
+                        if (IsHost)
+                        {
+                            for (int i = 0; i < ConnectedPeers.Count; i++)
+                            {
+                                if (ConnectedPeers[i] != sender)
+                                    SendPacketTo(ConnectedPeers[i], data, true);
+                            }
+                        }
+                        break;
+                    }
+
+                    case PacketType.UpgradeSync:
+                    {
+                        int upId = reader.ReadInt32();
+                        int lvl = reader.ReadInt32();
+                        OnUpgradeSyncReceived?.Invoke(upId, lvl);
+
+                        if (IsHost)
+                        {
+                            for (int i = 0; i < ConnectedPeers.Count; i++)
+                            {
+                                if (ConnectedPeers[i] != sender)
+                                    SendPacketTo(ConnectedPeers[i], data, true);
+                            }
+                        }
+                        break;
+                    }
+
+                    case PacketType.SackRipped:
+                    {
+                        int sackIdx = reader.ReadInt32();
+                        OnSackRippedReceived?.Invoke(sackIdx);
+
+                        if (IsHost)
+                        {
+                            for (int i = 0; i < ConnectedPeers.Count; i++)
+                            {
+                                if (ConnectedPeers[i] != sender)
+                                    SendPacketTo(ConnectedPeers[i], data, true);
+                            }
+                        }
+                        break;
+                    }
+
+                    case PacketType.PotatoClean:
+                    {
+                        int wsIdx = reader.ReadInt32();
+                        OnPotatoCleanReceived?.Invoke(wsIdx);
+
+                        if (IsHost)
+                        {
+                            for (int i = 0; i < ConnectedPeers.Count; i++)
+                            {
+                                if (ConnectedPeers[i] != sender)
+                                    SendPacketTo(ConnectedPeers[i], data, true);
+                            }
+                        }
+                        break;
+                    }
+
+                    case PacketType.QuestBump:
+                    {
+                        int kind = reader.ReadInt32();
+                        long amount = reader.ReadInt64();
+                        OnQuestBumpReceived?.Invoke(kind, amount);
+
+                        if (IsHost)
+                        {
+                            for (int i = 0; i < ConnectedPeers.Count; i++)
+                            {
+                                if (ConnectedPeers[i] != sender)
+                                    SendPacketTo(ConnectedPeers[i], data, true);
+                            }
+                        }
+                        break;
+                    }
+
+                    case PacketType.QuestFlag:
+                    {
+                        string flagId = reader.ReadString();
+                        OnQuestFlagReceived?.Invoke(flagId);
+
+                        if (IsHost)
+                        {
+                            for (int i = 0; i < ConnectedPeers.Count; i++)
+                            {
+                                if (ConnectedPeers[i] != sender)
+                                    SendPacketTo(ConnectedPeers[i], data, true);
+                            }
+                        }
+                        break;
+                    }
+
+                    case PacketType.QuestPage:
+                    {
+                        int page = reader.ReadInt32();
+                        OnQuestPageReceived?.Invoke(page);
 
                         if (IsHost)
                         {

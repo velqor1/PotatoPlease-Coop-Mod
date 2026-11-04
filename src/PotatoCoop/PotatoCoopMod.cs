@@ -148,7 +148,48 @@ namespace PotatoCoop
                     toolId = (int)player.ToolSwitcher.Current;
                 }
 
-                byte[] pkt = PacketSerializer.SerializePlayerTransform(pos, yaw, pitch, speed, isCrouching, toolId, false);
+                // Detect if player is holding potatoes in hands
+                try
+                {
+                    var attractor = GameObject.FindObjectOfType<PotatoAttractor>();
+                    if (attractor != null && (attractor.InFlightCount > 0 || (attractor.Captures != null && attractor.Captures.Count > 0)))
+                    {
+                        toolId = 10; // Holding potato
+                    }
+                }
+                catch { }
+
+                // Detect if player is holding / carrying a sack
+                try
+                {
+                    if (PatatoSackInteractable.All != null)
+                    {
+                        for (int i = 0; i < PatatoSackInteractable.All.Count; i++)
+                        {
+                            var s = PatatoSackInteractable.All[i];
+                            if (s != null && (s.IsCarried || s.RawHeld > 0))
+                            {
+                                toolId = 11; // Carrying sack
+                                break;
+                            }
+                        }
+                    }
+                }
+                catch { }
+
+                // Detect if local player is actively peeling
+                bool isPeeling = false;
+                try
+                {
+                    var session = Il2CppPotatoPeeler.PeelSession.Instance;
+                    if (session != null && session.IsActive)
+                    {
+                        isPeeling = true;
+                    }
+                }
+                catch { }
+
+                byte[] pkt = PacketSerializer.SerializePlayerTransform(pos, yaw, pitch, speed, isCrouching, toolId, isPeeling);
                 SteamNetManager.Instance.BroadcastPacket(pkt, false);
             }
             catch

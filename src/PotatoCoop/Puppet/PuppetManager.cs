@@ -72,9 +72,30 @@ namespace PotatoCoop.Puppet
         public void Update()
         {
             float dt = Time.deltaTime;
+
+            // Check if local player is actively peeling a potato on the cutting board
+            bool isLocalPeeling = false;
+            try
+            {
+                var session = Il2CppPotatoPeeler.PeelSession.Instance;
+                if (session != null && session.IsActive)
+                {
+                    isLocalPeeling = true;
+                }
+            }
+            catch { }
+
             foreach (var puppet in _puppets.Values)
             {
-                puppet?.Update(dt);
+                if (puppet == null || puppet.RootGameObject == null) continue;
+
+                // When local player is in peeling mode, hide puppets so they never obstruct the cutting board
+                if (puppet.RootGameObject.activeSelf == isLocalPeeling)
+                {
+                    puppet.RootGameObject.SetActive(!isLocalPeeling);
+                }
+
+                puppet.Update(dt);
             }
         }
 

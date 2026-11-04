@@ -16,7 +16,13 @@ namespace PotatoCoop.Network
         EconomySync = 8,
         PlayerLeave = 9,
         ChatMessage = 10,
-        StartShift = 11
+        StartShift = 11,
+        UpgradeSync = 12,
+        SackRipped = 13,
+        PotatoClean = 14,
+        QuestBump = 15,
+        QuestFlag = 16,
+        QuestPage = 17
     }
 
     public static class PacketSerializer
@@ -115,22 +121,79 @@ namespace PotatoCoop.Network
             return ms.ToArray();
         }
 
-        public static byte[] SerializeDoorSync(int doorId, bool isOpen)
+        public static byte[] SerializeDoorSync(int doorId, bool isOpen, bool isSliding = false)
         {
             using var ms = new MemoryStream();
             using var writer = new BinaryWriter(ms);
             writer.Write((byte)PacketType.DoorSync);
             writer.Write(doorId);
             writer.Write(isOpen);
+            writer.Write(isSliding);
             return ms.ToArray();
         }
 
-        public static byte[] SerializeEconomySync(int totalMoney)
+        public static byte[] SerializeEconomySync(long totalMoney)
         {
             using var ms = new MemoryStream();
             using var writer = new BinaryWriter(ms);
             writer.Write((byte)PacketType.EconomySync);
             writer.Write(totalMoney);
+            return ms.ToArray();
+        }
+
+        public static byte[] SerializeUpgradeSync(int upgradeId, int level)
+        {
+            using var ms = new MemoryStream();
+            using var writer = new BinaryWriter(ms);
+            writer.Write((byte)PacketType.UpgradeSync);
+            writer.Write(upgradeId);
+            writer.Write(level);
+            return ms.ToArray();
+        }
+
+        public static byte[] SerializeSackRipped(int sackIndex)
+        {
+            using var ms = new MemoryStream();
+            using var writer = new BinaryWriter(ms);
+            writer.Write((byte)PacketType.SackRipped);
+            writer.Write(sackIndex);
+            return ms.ToArray();
+        }
+
+        public static byte[] SerializePotatoClean(int workstationIndex)
+        {
+            using var ms = new MemoryStream();
+            using var writer = new BinaryWriter(ms);
+            writer.Write((byte)PacketType.PotatoClean);
+            writer.Write(workstationIndex);
+            return ms.ToArray();
+        }
+
+        public static byte[] SerializeQuestBump(int kind, long amount)
+        {
+            using var ms = new MemoryStream();
+            using var writer = new BinaryWriter(ms);
+            writer.Write((byte)PacketType.QuestBump);
+            writer.Write(kind);
+            writer.Write(amount);
+            return ms.ToArray();
+        }
+
+        public static byte[] SerializeQuestFlag(string flagId)
+        {
+            using var ms = new MemoryStream();
+            using var writer = new BinaryWriter(ms);
+            writer.Write((byte)PacketType.QuestFlag);
+            writer.Write(flagId ?? "");
+            return ms.ToArray();
+        }
+
+        public static byte[] SerializeQuestPage(int pageIndex)
+        {
+            using var ms = new MemoryStream();
+            using var writer = new BinaryWriter(ms);
+            writer.Write((byte)PacketType.QuestPage);
+            writer.Write(pageIndex);
             return ms.ToArray();
         }
     }

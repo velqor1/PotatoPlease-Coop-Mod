@@ -405,6 +405,23 @@ namespace PotatoCoop.Puppet
                     SetMaterial(tank, CreateMaterial(shader, new Color(0.85f, 0.25f, 0.15f))); // Red tank
                     break;
                 }
+                case 10: // Holding Potato in hands
+                {
+                    GameObject potato = CreatePrimitive(PrimitiveType.Sphere, "HeldPotato", prop.transform);
+                    potato.transform.localPosition = new Vector3(0, 0, 0.12f);
+                    potato.transform.localScale = new Vector3(0.18f, 0.24f, 0.18f);
+                    SetMaterial(potato, CreateMaterial(shader, new Color(0.72f, 0.54f, 0.32f)));
+                    break;
+                }
+                case 11: // Carrying Sack of potatoes
+                {
+                    GameObject sack = CreatePrimitive(PrimitiveType.Cylinder, "HeldSack", prop.transform);
+                    sack.transform.localPosition = new Vector3(0, -0.05f, 0.20f);
+                    sack.transform.localRotation = Quaternion.Euler(75f, 0, 0);
+                    sack.transform.localScale = new Vector3(0.32f, 0.45f, 0.32f);
+                    SetMaterial(sack, CreateMaterial(shader, new Color(0.62f, 0.50f, 0.36f)));
+                    break;
+                }
                 case 4: // Peeling Knife / Y-Peeler
                 default:
                 {
